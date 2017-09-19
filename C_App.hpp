@@ -53,6 +53,18 @@
  struct SLabel {
  };
  
+ //////////////////////////////
+ 
+ struct SAppend {
+    C_TreeView*    pTreeView;
+    ostringstream* pNumber;
+    ostringstream* pOffset;
+    ostringstream* pSize;
+    ostringstream* pValue;
+    ostringstream* pMeaning;
+    int*           pHidden;
+ };
+
 //////////////////////////////////////////////////////////////////////////////////
 // CLASS
 //////////////////////////////////////////////////////////////////////////////////
@@ -126,11 +138,8 @@
        bool bShnum; // true if pElf64->e_shnum == SHN_UNDEF
        
        ////////////////////////
-       
-       int appand_elf(ostringstream* pOffset, ostringstream* pSize, ostringstream* pValue, ostringstream* pMeaning);
-       
-       int appand_pro(int Number, ostringstream* pOffset, ostringstream* pSize, ostringstream* pValue, ostringstream* pMeaning);
-       int appand_sec(int Number, ostringstream* pOffset, ostringstream* pSize, ostringstream* pValue, ostringstream* pMeaning);
+
+       Gtk::TreeModel::Row appand(Gtk::TreeModel::Row* pParent, SAppend* pSAppend);
  };
 
 #endif // _C_APP_H_

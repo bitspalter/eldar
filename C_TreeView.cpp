@@ -12,7 +12,7 @@ C_TreeView::C_TreeView(int id){
    this->id = id;
     
    //Create the Tree model:
-   m_refTreeModel = Gtk::ListStore::create(m_Columns);
+   m_refTreeModel = Gtk::TreeStore::create(m_Columns);
    set_model(m_refTreeModel);
 
    //////////////////////////////////////////////
@@ -74,24 +74,14 @@ C_TreeView::~C_TreeView(){
 void C_TreeView::on_cell_0(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& iter){
    Gtk::TreeModel::Row row = *iter;
    
-   Glib::ustring nr = row[m_Columns.m_col_nr];
-   int i_dec = stoi(nr.data(), nullptr, 0);
+   int i_dec = row[m_Columns.m_col_hidden];
 
    Gtk::CellRendererText* text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
    
    if(text_renderer){
       text_renderer->property_foreground_rgba() = (i_dec % 2 ? colorF1 : colorF2);
       text_renderer->property_background_rgba() = (i_dec % 2 ? colorB1 : colorB2);
-      
-      if(this->id == C_TREEVIEW_PRO){
-         Glib::ustring test = "segment: " + nr;
-         text_renderer->property_text() = test;
-      }else
-      if(this->id == C_TREEVIEW_SEC){
-         Glib::ustring test = "section: " + nr;
-         text_renderer->property_text() = test;
-      }else
-         text_renderer->property_text() = nr;
+      text_renderer->property_text()            =  row[m_Columns.m_col_nr];
    }
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -100,8 +90,7 @@ void C_TreeView::on_cell_0(Gtk::CellRenderer* renderer, const Gtk::TreeModel::it
 void C_TreeView::on_cell_1(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& iter){
    Gtk::TreeModel::Row row = *iter;
 
-   Glib::ustring nr = row[m_Columns.m_col_nr];
-   int i_dec = stoi(nr.data(), nullptr, 0);
+   int i_dec = row[m_Columns.m_col_hidden];
 
    Gtk::CellRendererText* text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
    
@@ -117,8 +106,7 @@ void C_TreeView::on_cell_1(Gtk::CellRenderer* renderer, const Gtk::TreeModel::it
 void C_TreeView::on_cell_2(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& iter){
    Gtk::TreeModel::Row row = *iter;
 
-   Glib::ustring nr = row[m_Columns.m_col_nr];
-   int i_dec = stoi(nr.data(), nullptr, 0);
+   int i_dec = row[m_Columns.m_col_hidden];
 
    Gtk::CellRendererText* text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
    
@@ -134,8 +122,7 @@ void C_TreeView::on_cell_2(Gtk::CellRenderer* renderer, const Gtk::TreeModel::it
 void C_TreeView::on_cell_3(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& iter){
    Gtk::TreeModel::Row row = *iter;
 
-   Glib::ustring nr = row[m_Columns.m_col_nr];
-   int i_dec = stoi(nr.data(), nullptr, 0);
+   int i_dec = row[m_Columns.m_col_hidden];
 
    Gtk::CellRendererText* text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
    
@@ -151,8 +138,7 @@ void C_TreeView::on_cell_3(Gtk::CellRenderer* renderer, const Gtk::TreeModel::it
 void C_TreeView::on_cell_4(Gtk::CellRenderer* renderer, const Gtk::TreeModel::iterator& iter){
    Gtk::TreeModel::Row row = *iter;
 
-   Glib::ustring nr = row[m_Columns.m_col_nr];
-   int i_dec = stoi(nr.data(), nullptr, 0);
+   int i_dec = row[m_Columns.m_col_hidden];
 
    Gtk::CellRendererText* text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
    

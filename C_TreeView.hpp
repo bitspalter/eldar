@@ -43,13 +43,14 @@
            
           public:
 
-            ModelColumns(){add(m_col_nr); add(m_col_offset); add(m_col_size); add(m_col_value); add(m_col_meaning);}
+            ModelColumns(){add(m_col_nr); add(m_col_offset); add(m_col_size); add(m_col_value); add(m_col_meaning); add(m_col_hidden);}
 
             Gtk::TreeModelColumn<Glib::ustring> m_col_nr;
             Gtk::TreeModelColumn<Glib::ustring> m_col_offset;
             Gtk::TreeModelColumn<Glib::ustring> m_col_size;
             Gtk::TreeModelColumn<Glib::ustring> m_col_value;
             Gtk::TreeModelColumn<Glib::ustring> m_col_meaning;
+            Gtk::TreeModelColumn<int> m_col_hidden;
        };
 
        ModelColumns m_Columns;
@@ -64,7 +65,7 @@
        
        /////////////////////////
       
-       Glib::RefPtr<Gtk::ListStore> m_refTreeModel;
+       Glib::RefPtr<Gtk::TreeStore> m_refTreeModel;
        
        /////////////////////////
        

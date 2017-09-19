@@ -29,6 +29,25 @@ C_App::C_App(){
    m_TV_Gnu_Verneed.override_font(fdsc);
    m_TV_Gnu_Versym.override_font(fdsc);
    
+   Gdk::RGBA colorB = Gdk::RGBA("#232729");
+   Gdk::RGBA colorF = Gdk::RGBA("#777777");
+   
+   m_TV_Relocation.override_color(colorF);
+   m_TV_SymTab.override_color(colorF);
+   m_TV_Dynamic.override_color(colorF);
+   m_TV_Note.override_color(colorF);
+   m_TV_String.override_color(colorF);
+   m_TV_Gnu_Verneed.override_color(colorF);
+   m_TV_Gnu_Versym.override_color(colorF);
+   
+   m_TV_Relocation.override_background_color(colorB);
+   m_TV_SymTab.override_background_color(colorB);
+   m_TV_Dynamic.override_background_color(colorB);
+   m_TV_Note.override_background_color(colorB);
+   m_TV_String.override_background_color(colorB);
+   m_TV_Gnu_Verneed.override_background_color(colorB);
+   m_TV_Gnu_Versym.override_background_color(colorB);
+   
    //////////////////////////////////////////////////////////////
    
    m_SW_Elf.add(CTV_ELF);
@@ -289,12 +308,23 @@ int C_App::read32bit(char* pfile){
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::show_ELF64_Head(){
  
-   int Offset = 0;
+   int Offset = 0, n = 1;
    
-   ostringstream sOffset, sSize, sValue, sMeaning;
+   ostringstream sNumber, sOffset, sSize, sValue, sMeaning;
+   
+   SAppend sAppend;
+   
+   sAppend.pTreeView = &CTV_ELF;
+   sAppend.pNumber   = &sNumber;
+   sAppend.pOffset   = &sOffset;
+   sAppend.pSize     = &sSize;
+   sAppend.pValue    = &sValue;
+   sAppend.pMeaning  = &sMeaning;
+   sAppend.pHidden   = &n;
    
    ///////////////////////////////////////////////////////////
-   
+
+   sNumber << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize   << "0x" << hex << uppercase << setw(2) << setfill('0') << 4;
    sValue  << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_MAG0]
@@ -303,23 +333,25 @@ int C_App::show_ELF64_Head(){
                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_MAG3];
    sMeaning << "magic Number";
 
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 4;
    
    ///////////////////////////////////////////////////////////
 
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 1;
    sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_CLASS];
    sMeaning << "64-Bit";
 
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 1;
    
    ///////////////////////////////////////////////////////////
-
+   
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 1;
    sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_DATA];
@@ -329,12 +361,13 @@ int C_App::show_ELF64_Head(){
    if(pElf64->e_ident[EI_DATA] == ELFDATA2MSB) sMeaning << "big-endian";
    else                                        sMeaning << "Unknown data format";
 
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 1;
 
    ///////////////////////////////////////////////////////////
-
+   
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 1;
    sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_VERSION];
@@ -344,12 +377,13 @@ int C_App::show_ELF64_Head(){
    if(pElf64->e_ident[EI_VERSION] == EV_NONE)    sMeaning << "invalid elf";    
    else                                          sMeaning << "unknown elf"; 
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 1;
    
    ///////////////////////////////////////////////////////////
-
+   
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 1;
    sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_OSABI];
@@ -378,34 +412,43 @@ int C_App::show_ELF64_Head(){
       default:   sMeaning << "Unknown";        break;
    }
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 1;
    
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 1;
    sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_ABIVERSION];
    sMeaning << "specifies the ABI version"; 
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 1;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 7;
-   sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD];
+   sValue   << "0x" << hex << uppercase << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD]
+                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD + 1]
+                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD + 2]
+                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD + 3]
+                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD + 4]
+                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD + 5]
+                                        << setw(2) << setfill('0') << (int)pElf64->e_ident[EI_PAD + 6];
    sMeaning << "currently unused";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 7;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_type;
@@ -420,12 +463,13 @@ int C_App::show_ELF64_Head(){
       default:      sMeaning << "Unknown";
    } 
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 2;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_machine;
@@ -447,12 +491,13 @@ int C_App::show_ELF64_Head(){
       default:   sMeaning << "Unknown";
    }
 
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 2;
 
    ///////////////////////////////////////////////////////////
-
+   
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 4;
    sValue   << "0x" << hex << uppercase << setw(8) << setfill('0') << pElf64->e_version;
@@ -462,100 +507,109 @@ int C_App::show_ELF64_Head(){
    if(pElf64->e_version == EV_NONE)    sMeaning << "invalid elf";    
    else                                sMeaning << "unknown elf"; 
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 4;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2)  << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2)  << setfill('0') << 8;
    sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pElf64->e_entry;
    sMeaning << "Entrypoint";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 8;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2)  << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2)  << setfill('0') << 8;
    sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pElf64->e_phoff;
    sMeaning << "Offset Program Header";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
    
    Offset += 8;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2)  << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2)  << setfill('0') << 8;
    sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pElf64->e_shoff;
    sMeaning << "Offset Section Header";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 8;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 4;
    sValue   << "0x" << hex << uppercase << setw(8) << setfill('0') << pElf64->e_flags;
    sMeaning << "Depends on the target architecture";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 4;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_flags;
    sMeaning << "Size of ELF Header";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 2;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_phentsize;
    sMeaning << "Size of Program Header Table";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 2;
    
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_phnum;
    sMeaning << "Entries in Program Header Table";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 2;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_shentsize;
    sMeaning << "Size of Section Header Table";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 2;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_shnum;
@@ -568,53 +622,23 @@ int C_App::show_ELF64_Head(){
       bShnum = false;
    }
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 2;
 
    ///////////////////////////////////////////////////////////
    
+   sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
    sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_shstrndx;
    sMeaning << "Index of the Section with Section Names";
    
-   appand_elf(&sOffset, &sSize, &sValue, &sMeaning);
+   appand(nullptr, &sAppend);
 
    Offset += 2;
 
    return(C_APP_READY);  
-}
-//////////////////////////////////////////////////////////////////////////////////
-// [ appand_elf ]
-//////////////////////////////////////////////////////////////////////////////////
-int C_App::appand_elf(ostringstream* pOffset, ostringstream* pSize, ostringstream* pValue, ostringstream* pMeaning){
-    
-   Gtk::TreeModel::iterator iter = CTV_ELF.m_refTreeModel->append();
-   Gtk::TreeModel::Row row       = *iter;
-
-   ostringstream Number;
-
-   Number << "0x" << hex << uppercase << setw(2) << setfill('0') << CTV_ELF.m_refTreeModel->children().size();
-
-   row.set_value(0, Number.str());
-   row.set_value(1, pOffset->str());
-   row.set_value(2, pSize->str());
-   row.set_value(3, pValue->str());
-   row.set_value(4, pMeaning->str());
-   
-   // Hack
-   pOffset->str("");
-   pSize->str("");
-   pValue->str("");
-   pMeaning->str("");
-   
-   pOffset->str().clear();
-   pSize->str().clear();
-   pValue->str().clear();
-   pMeaning->str().clear();
-   
-   return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
 // [ show_ELF64_PHead ]
@@ -623,16 +647,33 @@ int C_App::show_ELF64_PHead(){
 
    uint64_t Offset = pElf64->e_phoff;
    
-   ostringstream sOffset, sSize, sValue, sMeaning;
+   ostringstream sNumber, sOffset, sSize, sValue, sMeaning;
+   
+   Gtk::TreeModel::Row row;
+   
+   int Hidden = 0;
+   
+   SAppend sAppend;
+   
+   sAppend.pTreeView = &CTV_Program;
+   sAppend.pNumber   = &sNumber;
+   sAppend.pOffset   = &sOffset;
+   sAppend.pSize     = &sSize;
+   sAppend.pValue    = &sValue;
+   sAppend.pMeaning  = &sMeaning;
+   sAppend.pHidden   = &Hidden;
    
    ///////////////////////////////////////////////////////////
 
    for(int n = 0; n < pElf64->e_phnum; n++){
-    
-      sOffset  << "0x" << hex << uppercase << setw(16) << setfill('0') << Offset;
-      sSize    << "0x" << hex << uppercase << setw(2)  << setfill('0') << 4;
-      sValue   << "0x" << hex << uppercase << setw(8)  << setfill('0') << pPHead64->p_type;
-
+       
+      Hidden = n + 1;
+      
+      sNumber  << "Segment: 0x" << hex << uppercase << setw(2)  << setfill('0') << n + 1;
+      sOffset  << "0x"          << hex << uppercase << setw(16) << setfill('0') << Offset;
+      sSize    << "0x"          << hex << uppercase << setw(2)  << setfill('0') << 4;
+      sValue   << "0x"          << hex << uppercase << setw(8)  << setfill('0') << pPHead64->p_type;
+      
       switch(pPHead64->p_type){
          case PT_NULL:         sMeaning << "unused";                      break;
          case PT_LOAD:         sMeaning << "loadable segment";            break;
@@ -655,8 +696,8 @@ int C_App::show_ELF64_PHead(){
             sMeaning << "unknown";
          }  
       }
-      
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+
+      row = appand(nullptr, &sAppend);
    
       Offset += 4;
       
@@ -667,7 +708,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(8)  << setfill('0') << pPHead64->p_flags;
       sMeaning << "Segment-dependent flags"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
    
       Offset += 4;
       
@@ -678,7 +719,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pPHead64->p_offset;
       sMeaning << "Address in File"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
 
@@ -689,7 +730,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pPHead64->p_vaddr;
       sMeaning << "Address in Memory"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
    
       Offset += 8;
 
@@ -700,7 +741,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pPHead64->p_paddr;
       sMeaning << "physical address"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
 
@@ -711,7 +752,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pPHead64->p_filesz;
       sMeaning << "Size in File"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
 
@@ -722,7 +763,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pPHead64->p_memsz;
       sMeaning << "Size in Memory"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
 
@@ -733,7 +774,7 @@ int C_App::show_ELF64_PHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pPHead64->p_align;
       sMeaning << "alignment"; 
 
-      appand_pro(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
 
@@ -745,46 +786,27 @@ int C_App::show_ELF64_PHead(){
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
-// [ appand_pro ]
-//////////////////////////////////////////////////////////////////////////////////
-int C_App::appand_pro(int Number, ostringstream* pOffset, ostringstream* pSize, ostringstream* pValue, ostringstream* pMeaning){
-    
-   Gtk::TreeModel::iterator iter = CTV_Program.m_refTreeModel->append();
-   Gtk::TreeModel::Row row       = *iter;
-
-   ostringstream strNumber;
-
-   strNumber << "0x" << hex << uppercase << setw(2) << setfill('0') << Number;
-
-   row.set_value(0, strNumber.str());
-   row.set_value(1, pOffset->str());
-   row.set_value(2, pSize->str());
-   row.set_value(3, pValue->str());
-   row.set_value(4, pMeaning->str());
-   
-   // Hack
-   pOffset->str("");
-   pSize->str("");
-   pValue->str("");
-   pMeaning->str("");
-   
-   pOffset->str().clear();
-   pSize->str().clear();
-   pValue->str().clear();
-   pMeaning->str().clear();
-   
-   return(C_APP_READY); 
-}
-//////////////////////////////////////////////////////////////////////////////////
 // [ show_ELF64_SHead ]
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::show_ELF64_SHead(){
 
    uint64_t Offset = pElf64->e_shoff;
    
-   ostringstream sOffset, sSize, sValue, sMeaning;
+   ostringstream sNumber, sOffset, sSize, sValue, sMeaning;
    
-   int shnum = 0;
+   Gtk::TreeModel::Row row;
+   
+   int shnum = 0, Hidden = 0;
+   
+   SAppend sAppend;
+   
+   sAppend.pTreeView = &CTV_Section;
+   sAppend.pNumber   = &sNumber;
+   sAppend.pOffset   = &sOffset;
+   sAppend.pSize     = &sSize;
+   sAppend.pValue    = &sValue;
+   sAppend.pMeaning  = &sMeaning;
+   sAppend.pHidden   = &Hidden;
    
    /////////////////////////////////////////////////////////// 
    
@@ -793,12 +815,15 @@ int C_App::show_ELF64_SHead(){
    
    for(int n = 0; n < shnum; n++){
        
-      sOffset  << "0x" << hex << uppercase << setw(16) << setfill('0') << Offset;
-      sSize    << "0x" << hex << uppercase << setw(2)  << setfill('0') << 4;
-      sValue   << "0x" << hex << uppercase << setw(8)  << setfill('0') << pSHead64->sh_name;
+      Hidden = n + 1;
+      
+      sNumber  << "Section: 0x" << hex << uppercase << setw(2)  << setfill('0') << n + 1;
+      sOffset  << "0x"          << hex << uppercase << setw(16) << setfill('0') << Offset;
+      sSize    << "0x"          << hex << uppercase << setw(2)  << setfill('0') << 4;
+      sValue   << "0x"          << hex << uppercase << setw(8)  << setfill('0') << pSHead64->sh_name;
       sMeaning << "Name: " << (char*)(pfile + pSHStr64->sh_offset + pSHead64->sh_name); 
 
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      row = appand(nullptr, &sAppend);
 
       Offset += 4;
       
@@ -848,7 +873,7 @@ int C_App::show_ELF64_SHead(){
          }
       }
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
    
       Offset += 4;
       
@@ -876,7 +901,7 @@ int C_App::show_ELF64_SHead(){
       if(pSHead64->sh_flags & SHF_EXCLUDE)          sMeaning << "[EXCLUDE]";
       if(pSHead64->sh_flags & SHF_MASKPROC)         sMeaning << "[MASKPROC]";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
    
       Offset += 8;
       
@@ -887,7 +912,7 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pSHead64->sh_addr;
       sMeaning << "Address in Memory";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
    
       Offset += 8;
 
@@ -898,7 +923,7 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pSHead64->sh_offset;
       sMeaning << "Address in File";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
       
@@ -909,7 +934,7 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pSHead64->sh_size;
       sMeaning << "Size in File";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
 
@@ -920,11 +945,10 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x" << hex << uppercase << setw(8)  << setfill('0') << pSHead64->sh_link;
       sMeaning << "Depending on the type of section";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 4;
       
-
       ///////////////////////////////////////////////////////////////
       
       sOffset  << "0x" << hex << uppercase << setw(16) << setfill('0') << Offset;
@@ -932,7 +956,7 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x" << hex << uppercase << setw(8)  << setfill('0') << pSHead64->sh_info;
       sMeaning << "Depending on the type of section";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 4;
       
@@ -943,7 +967,7 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x" << hex << uppercase << setw(16) << setfill('0') << pSHead64->sh_addralign;
       sMeaning << "alignment";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
 
       Offset += 8;
       
@@ -956,7 +980,7 @@ int C_App::show_ELF64_SHead(){
       if(!pSHead64->sh_entsize) sMeaning << "not fixed-size entries";
       else                      sMeaning << "fixed-size entries";
       
-      appand_sec(n + 1, &sOffset, &sSize, &sValue, &sMeaning);
+      appand(&row, &sAppend);
    
       Offset += 8;
 
@@ -968,35 +992,39 @@ int C_App::show_ELF64_SHead(){
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
-// [ appand_sec ]
+// [ appand ]
 //////////////////////////////////////////////////////////////////////////////////
-int C_App::appand_sec(int Number, ostringstream* pOffset, ostringstream* pSize, ostringstream* pValue, ostringstream* pMeaning){
-    
-   Gtk::TreeModel::iterator iter = CTV_Section.m_refTreeModel->append();
-   Gtk::TreeModel::Row row       = *iter;
+Gtk::TreeModel::Row C_App::appand(Gtk::TreeModel::Row* pParent, SAppend* pSAppend){
+   
+   Gtk::TreeModel::iterator iter;
+   Gtk::TreeModel::Row row;
+   
+   if(pParent == nullptr) iter = pSAppend->pTreeView->m_refTreeModel->append();
+   else                   iter = pSAppend->pTreeView->m_refTreeModel->append(pParent->children());
 
-   ostringstream strNumber;
-
-   strNumber << "0x" << hex << uppercase << setw(2) << setfill('0') << Number;
-
-   row.set_value(0, strNumber.str());
-   row.set_value(1, pOffset->str());
-   row.set_value(2, pSize->str());
-   row.set_value(3, pValue->str());
-   row.set_value(4, pMeaning->str());
+   row = *iter;
+   
+   row.set_value(0,  pSAppend->pNumber->str());
+   row.set_value(1,  pSAppend->pOffset->str());
+   row.set_value(2,  pSAppend->pSize->str());
+   row.set_value(3,  pSAppend->pValue->str());
+   row.set_value(4,  pSAppend->pMeaning->str());
+   row.set_value(5, *pSAppend->pHidden);
    
    // Hack
-   pOffset->str("");
-   pSize->str("");
-   pValue->str("");
-   pMeaning->str("");
+   pSAppend->pNumber->str("");
+   pSAppend->pOffset->str("");
+   pSAppend->pSize->str("");
+   pSAppend->pValue->str("");
+   pSAppend->pMeaning->str("");
    
-   pOffset->str().clear();
-   pSize->str().clear();
-   pValue->str().clear();
-   pMeaning->str().clear();
+   pSAppend->pNumber->str().clear();
+   pSAppend->pOffset->str().clear();
+   pSAppend->pSize->str().clear();
+   pSAppend->pValue->str().clear();
+   pSAppend->pMeaning->str().clear();
    
-   return(C_APP_READY); 
+   return(row); 
 }
 //////////////////////////////////////////////////////////////////////////////////
 // [ show_Section ]
