@@ -8,9 +8,7 @@
 // [ Konstructor ]  
 //////////////////////////////////////////////////////////////////////////////////
 C_App::C_App(){
-  
-   //this->set_icon_from_file("1.png");
-   //this->set_title("ELF - Viewer");
+
    this->resize(750, 500);
    
    //////////////////////////////////////////////////////////////
@@ -20,26 +18,9 @@ C_App::C_App(){
    sbutton.open.signal_clicked().connect(sigc::mem_fun(*this, &C_App::on_button_open));
    
    ////////////////
-   // label
+
    Pango::FontDescription fdsc("Courier New 10"); 
-   
-   slabel.head_elf.set_label("elf header");
-   slabel.head_elf.set_alignment(0.0f, 0.5f);
-   slabel.head_elf.set_size_request(550, 30);
-   slabel.head_elf.override_font(fdsc);
-   
-   slabel.head_program.set_label("program header");
-   slabel.head_program.set_alignment(0.0f, 0.5f);
-   slabel.head_program.set_size_request(550, 30);
-   slabel.head_program.override_font(fdsc);
-   
-   slabel.head_Section.set_label("section header");
-   slabel.head_Section.set_alignment(0.0f, 0.5f);
-   slabel.head_Section.set_size_request(550, 30);
-   slabel.head_Section.override_font(fdsc);
-   
-   //////////////////////////////////////////////////////////////
-   
+  
    m_TV_Relocation.override_font(fdsc);
    m_TV_SymTab.override_font(fdsc);
    m_TV_Dynamic.override_font(fdsc);
@@ -171,9 +152,7 @@ void C_App::on_button_open(){
       case(Gtk::RESPONSE_OK):{
          sFile = dialog.get_filename();
          m_header_bar.set_subtitle(sFile.data());
-         
          open_file();
-         
          break;
       }
       case(Gtk::RESPONSE_CANCEL): break;
@@ -184,10 +163,7 @@ void C_App::on_button_open(){
 // [ on_notebook_switch_page ]
 //////////////////////////////////////////////////////////////////////////////////
 void C_App::on_notebook_switch_page(Gtk::Widget* /* page */, guint page_num){
-    
-   cout << "Switched to tab with index " << page_num << endl;
-    
-    
+   //cout << "Switched to tab with index " << page_num << endl;
 }
 //////////////////////////////////////////////////////////////////////////////////
 // [ open_file ]
