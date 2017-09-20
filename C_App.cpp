@@ -220,6 +220,8 @@ int C_App::open_file(){
    pTB_Gnu_Versym->set_text("");
    m_TV_Gnu_Versym.set_buffer(pTB_Gnu_Versym);
    
+   vGNUSymbol.clear();
+   
    ///////////////////////////////////////////////////////
    
    if(stat(sFile.data(), &st) != 0){
