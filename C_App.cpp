@@ -981,7 +981,8 @@ int C_App::show_ELF64_SHead(){
       if(pSHead64->sh_flags & SHF_ORDERED)          sMeaning << "[ORDERED]";
       if(pSHead64->sh_flags & SHF_EXCLUDE)          sMeaning << "[EXCLUDE]";
       if(pSHead64->sh_flags & SHF_MASKPROC)         sMeaning << "[MASKPROC]";
-      
+      if(pSHead64->sh_flags & SHF_COMPRESSED)       sMeaning << "[COMPRESSED]";
+            
       appand(&row, &sAppend);
    
       Offset += 8;
@@ -1368,261 +1369,261 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
       switch(pDyn->d_tag){
          case DT_NEEDED: 
             sData << setw(20) << setfill(' ') << "(DT_NEEDED)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pfile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pfile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
             break;   
          case DT_PLTRELSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PLTRELSZ)";
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_PLTGOT: 
             sData << setw(20) << setfill(' ') << "(DT_PLTGOT)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_HASH:            
             sData << setw(20) << setfill(' ') << "(DT_HASH)";
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;   
          case DT_STRTAB:          
             sData << setw(20) << setfill(' ') << "(DT_STRTAB)";
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_SYMTAB:          
             sData << setw(20) << setfill(' ') << "(DT_SYMTAB)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_RELA:            
-            sData << setw(20) << setfill(' ') << "vDT_RELA)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << setw(20) << setfill(' ') << "(DT_RELA)"; 
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;   
          case DT_RELASZ:          
             sData << setw(20) << setfill(' ') << "(DT_RELASZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_RELAENT:         
             sData << setw(20) << setfill(' ') << "(DT_RELAENT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_STRSZ:           
             sData << setw(20) << setfill(' ') << "(DT_STRSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;   
          case DT_SYMENT:          
             sData << setw(20) << setfill(' ') << "(DT_SYMENT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_INIT:            
             sData << setw(20) << setfill(' ') << "(DT_INIT)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_FINI:            
             sData << setw(20) << setfill(' ') << "(DT_FINI)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;   
          case DT_SONAME:          
             sData << setw(20) << setfill(' ') << "(DT_SONAME)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_RPATH:           
             sData << setw(20) << setfill(' ') << "(DT_RPATH)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_REL:             
             sData << setw(20) << setfill(' ') << "(DT_REL)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_RELSZ:           
             sData << setw(20) << setfill(' ') << "(DT_RELSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_RELENT:          
             sData << setw(20) << setfill(' ') << "(DT_RELENT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_PLTREL:          
             sData << setw(20) << setfill(' ') << "(DT_PLTREL)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_DEBUG:           
             sData << setw(20) << setfill(' ') << "(DT_DEBUG)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_JMPREL:          
             sData << setw(20) << setfill(' ') << "(DT_JMPREL)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_INIT_ARRAY:      
             sData << setw(20) << setfill(' ') << "(DT_INIT_ARRAY)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_FINI_ARRAY:      
             sData << setw(20) << setfill(' ') << "(DT_FINI_ARRAY)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_INIT_ARRAYSZ:    
             sData << setw(20) << setfill(' ') << "(DT_INIT_ARRAYSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break; 
          case DT_FINI_ARRAYSZ:    
             sData << setw(20) << setfill(' ') << "(DT_FINI_ARRAYSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break; 
          case DT_RUNPATH:         
             sData << setw(20) << setfill(' ') << "(DT_RUNPATH)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_FLAGS:           
             sData << setw(20) << setfill(' ') << "(DT_FLAGS)";
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_PREINIT_ARRAY:   
             sData << setw(20) << setfill(' ') << "(DT_PREINIT_ARRAY)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_PREINIT_ARRAYSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PREINIT_ARRAYSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_NUM:             
             sData << setw(20) << setfill(' ') << "(DT_NUM)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_PROCNUM:         
             sData << setw(20) << setfill(' ') << "(DT_PROCNUM)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          //////////////////////////////////////////////////////////////////////
          case DT_VERSYM:          
             sData << setw(20) << setfill(' ') << "(DT_VERSYM)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_RELACOUNT:       
             sData << setw(20) << setfill(' ') << "(DT_RELACOUNT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_RELCOUNT:        
             sData << setw(20) << setfill(' ') << "(DT_RELCOUNT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_FLAGS_1:         
             sData << setw(20) << setfill(' ') << "(DT_FLAGS_1)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_VERDEF:          
             sData << setw(20) << setfill(' ') << "(DT_VERDEF)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_VERDEFNUM:       
             sData << setw(20) << setfill(' ') << "(DT_VERDEFNUM)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_VERNEED:         
             sData << setw(20) << setfill(' ') << "(DT_VERNEED)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_VERNEEDNUM:      
             sData << setw(20) << setfill(' ') << "(DT_VERNEEDNUM)";
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_AUXILIARY:       
             sData << setw(20) << setfill(' ') << "(DT_AUXILIARY)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_FILTER:          
             sData << setw(20) << setfill(' ') << "(DT_FILTER)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          //////////////////////////////////////////////////////////////////////
          //case DT_VALRNGLO:      cout << "DT_VALRNGLO"        << endl; break;
          case DT_GNU_PRELINKED:   
             sData << setw(20) << setfill(' ') << "(DT_GNU_PRELINKED)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_GNU_CONFLICTSZ:  
             sData << setw(20) << setfill(' ') << "(DT_GNU_CONFLICTSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_GNU_LIBLISTSZ:   
             sData << setw(20) << setfill(' ') << "(DT_GNU_LIBLISTSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_CHECKSUM:        
             sData << setw(20) << setfill(' ') << "(DT_CHECKSUM)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_PLTPADSZ:        
             sData << setw(20) << setfill(' ') << "(DT_PLTPADSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_MOVEENT:         
             sData << setw(20) << setfill(' ') << "(DT_MOVEENT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_MOVESZ:          
             sData << setw(20) << setfill(' ') << "(DT_MOVESZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_FEATURE_1:       
             sData << setw(20) << setfill(' ') << "(DT_FEATURE_1)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_POSFLAG_1:       
             sData << setw(20) << setfill(' ') << "(DT_POSFLAG_1)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_SYMINSZ:         
             sData << setw(20) << setfill(' ') << "(DT_SYMINSZ)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_SYMINENT:        
             sData << setw(20) << setfill(' ') << "(DT_SYMINENT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          //case DT_VALRNGHI:      cout << "DT_VALRNGHI"        << endl; break;
          //////////////////////////////////////////////////////////////////////
          //case DT_ADDRRNGLO:     cout << "DT_ADDRRNGLO"       << endl; break;
          case DT_GNU_HASH:        
             sData << setw(20) << setfill(' ') << "(DT_GNU_HASH)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_TLSDESC_PLT:    
             sData << setw(20) << setfill(' ') << "(DT_TLSDESC_PLT)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_TLSDESC_GOT:     
             sData << setw(20) << setfill(' ') << "(DT_TLSDESC_GOT)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_GNU_CONFLICT:    
             sData << setw(20) << setfill(' ') << "(DT_GNU_CONFLICT)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_GNU_LIBLIST:     
             sData << setw(20) << setfill(' ') << "(DT_GNU_LIBLIST)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_CONFIG:          
             sData << setw(20) << setfill(' ') << "(DT_CONFIG)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_DEPAUDIT:        
             sData << setw(20) << setfill(' ') << "(DT_DEPAUDIT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_AUDIT:           
             sData << setw(20) << setfill(' ') << "(DT_AUDIT)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_PLTPAD:          
             sData << setw(20) << setfill(' ') << "(DT_PLTPAD)"; 
-            sData << " Val: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_MOVETAB:         
             sData << setw(20) << setfill(' ') << "(DT_MOVETAB)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_SYMINFO:         
             sData << setw(20) << setfill(' ') << "(DT_SYMINFO)"; 
-            sData << " Ptr: 0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          //case DT_ADDRRNGHI:     cout << "DT_ADDRRNGHI"       << endl; break;
       }
@@ -1988,7 +1989,7 @@ int C_App::show_GNU_Versym64(Elf64_Shdr* pSHead){
       if(val >= 0x8000) val &= 0xFF; // can't figure out what 0x80 means :o(
       sData << "0x"          << hex << right << uppercase << setw(4) << setfill('0') << n;
       sData << " Version:0x" << hex << uppercase << setw(4) << setfill('0') << val;
-      sData << " " << setw(20) << setfill(' ') << left << vGNUSymbol64[val].data();
+      sData << " " << setw(17) << setfill(' ') << left << vGNUSymbol64[val].data();
       if(!((n + 1) % 4)) sData << endl;
    }
 
@@ -2610,6 +2611,7 @@ int C_App::show_ELF32_SHead(){
       if(pSHead32->sh_flags & SHF_ORDERED)          sMeaning << "[ORDERED]";
       if(pSHead32->sh_flags & SHF_EXCLUDE)          sMeaning << "[EXCLUDE]";
       if(pSHead32->sh_flags & SHF_MASKPROC)         sMeaning << "[MASKPROC]";
+      if(pSHead32->sh_flags & SHF_COMPRESSED)       sMeaning << "[COMPRESSED]";
       
       appand(&row, &sAppend);
    
@@ -2847,261 +2849,261 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
       switch(pDyn->d_tag){
          case DT_NEEDED: 
             sData << setw(20) << setfill(' ') << "(DT_NEEDED)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pfile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pfile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
             break;   
          case DT_PLTRELSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PLTRELSZ)";
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_PLTGOT: 
             sData << setw(20) << setfill(' ') << "(DT_PLTGOT)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_HASH:            
             sData << setw(20) << setfill(' ') << "(DT_HASH)";
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;   
          case DT_STRTAB:          
             sData << setw(20) << setfill(' ') << "(DT_STRTAB)";
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_SYMTAB:          
             sData << setw(20) << setfill(' ') << "(DT_SYMTAB)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_RELA:            
-            sData << setw(20) << setfill(' ') << "vDT_RELA)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << setw(20) << setfill(' ') << "(DT_RELA)"; 
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;   
          case DT_RELASZ:          
             sData << setw(20) << setfill(' ') << "(DT_RELASZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_RELAENT:         
             sData << setw(20) << setfill(' ') << "(DT_RELAENT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_STRSZ:           
             sData << setw(20) << setfill(' ') << "(DT_STRSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;   
          case DT_SYMENT:          
             sData << setw(20) << setfill(' ') << "(DT_SYMENT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break;
          case DT_INIT:            
             sData << setw(20) << setfill(' ') << "(DT_INIT)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_FINI:            
             sData << setw(20) << setfill(' ') << "(DT_FINI)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;   
          case DT_SONAME:          
             sData << setw(20) << setfill(' ') << "(DT_SONAME)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_RPATH:           
             sData << setw(20) << setfill(' ') << "(DT_RPATH)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_REL:             
             sData << setw(20) << setfill(' ') << "(DT_REL)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_RELSZ:           
             sData << setw(20) << setfill(' ') << "(DT_RELSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_RELENT:          
             sData << setw(20) << setfill(' ') << "(DT_RELENT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_PLTREL:          
             sData << setw(20) << setfill(' ') << "(DT_PLTREL)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_DEBUG:           
             sData << setw(20) << setfill(' ') << "(DT_DEBUG)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_JMPREL:          
             sData << setw(20) << setfill(' ') << "(DT_JMPREL)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_INIT_ARRAY:      
             sData << setw(20) << setfill(' ') << "(DT_INIT_ARRAY)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_FINI_ARRAY:      
             sData << setw(20) << setfill(' ') << "(DT_FINI_ARRAY)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_INIT_ARRAYSZ:    
             sData << setw(20) << setfill(' ') << "(DT_INIT_ARRAYSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break; 
          case DT_FINI_ARRAYSZ:    
             sData << setw(20) << setfill(' ') << "(DT_FINI_ARRAYSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " bytes" << endl;
             break; 
          case DT_RUNPATH:         
             sData << setw(20) << setfill(' ') << "(DT_RUNPATH)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_FLAGS:           
             sData << setw(20) << setfill(' ') << "(DT_FLAGS)";
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_PREINIT_ARRAY:   
             sData << setw(20) << setfill(' ') << "(DT_PREINIT_ARRAY)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_PREINIT_ARRAYSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PREINIT_ARRAYSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_NUM:             
             sData << setw(20) << setfill(' ') << "(DT_NUM)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_PROCNUM:         
             sData << setw(20) << setfill(' ') << "(DT_PROCNUM)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          //////////////////////////////////////////////////////////////////////
          case DT_VERSYM:          
             sData << setw(20) << setfill(' ') << "(DT_VERSYM)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_RELACOUNT:       
             sData << setw(20) << setfill(' ') << "(DT_RELACOUNT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_RELCOUNT:        
             sData << setw(20) << setfill(' ') << "(DT_RELCOUNT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_FLAGS_1:         
             sData << setw(20) << setfill(' ') << "(DT_FLAGS_1)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_VERDEF:          
             sData << setw(20) << setfill(' ') << "(DT_VERDEF)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_VERDEFNUM:       
             sData << setw(20) << setfill(' ') << "(DT_VERDEFNUM)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_VERNEED:         
             sData << setw(20) << setfill(' ') << "(DT_VERNEED)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
          case DT_VERNEEDNUM:      
             sData << setw(20) << setfill(' ') << "(DT_VERNEEDNUM)";
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_AUXILIARY:       
             sData << setw(20) << setfill(' ') << "(DT_AUXILIARY)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          case DT_FILTER:          
             sData << setw(20) << setfill(' ') << "(DT_FILTER)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break; 
          //////////////////////////////////////////////////////////////////////
          //case DT_VALRNGLO:      cout << "DT_VALRNGLO"        << endl; break;
          case DT_GNU_PRELINKED:   
             sData << setw(20) << setfill(' ') << "(DT_GNU_PRELINKED)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_GNU_CONFLICTSZ:  
             sData << setw(20) << setfill(' ') << "(DT_GNU_CONFLICTSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_GNU_LIBLISTSZ:   
             sData << setw(20) << setfill(' ') << "(DT_GNU_LIBLISTSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_CHECKSUM:        
             sData << setw(20) << setfill(' ') << "(DT_CHECKSUM)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_PLTPADSZ:        
             sData << setw(20) << setfill(' ') << "(DT_PLTPADSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_MOVEENT:         
             sData << setw(20) << setfill(' ') << "(DT_MOVEENT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_MOVESZ:          
             sData << setw(20) << setfill(' ') << "(DT_MOVESZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_FEATURE_1:       
             sData << setw(20) << setfill(' ') << "(DT_FEATURE_1)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_POSFLAG_1:       
             sData << setw(20) << setfill(' ') << "(DT_POSFLAG_1)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_SYMINSZ:         
             sData << setw(20) << setfill(' ') << "(DT_SYMINSZ)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_SYMINENT:        
             sData << setw(20) << setfill(' ') << "(DT_SYMINENT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          //case DT_VALRNGHI:      cout << "DT_VALRNGHI"        << endl; break;
          //////////////////////////////////////////////////////////////////////
          //case DT_ADDRRNGLO:     cout << "DT_ADDRRNGLO"       << endl; break;
          case DT_GNU_HASH:        
             sData << setw(20) << setfill(' ') << "(DT_GNU_HASH)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_TLSDESC_PLT:    
             sData << setw(20) << setfill(' ') << "(DT_TLSDESC_PLT)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_TLSDESC_GOT:     
             sData << setw(20) << setfill(' ') << "(DT_TLSDESC_GOT)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_GNU_CONFLICT:    
             sData << setw(20) << setfill(' ') << "(DT_GNU_CONFLICT)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_GNU_LIBLIST:     
             sData << setw(20) << setfill(' ') << "(DT_GNU_LIBLIST)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_CONFIG:          
             sData << setw(20) << setfill(' ') << "(DT_CONFIG)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_DEPAUDIT:        
             sData << setw(20) << setfill(' ') << "(DT_DEPAUDIT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_AUDIT:           
             sData << setw(20) << setfill(' ') << "(DT_AUDIT)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_PLTPAD:          
             sData << setw(20) << setfill(' ') << "(DT_PLTPAD)"; 
-            sData << " Val: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
          case DT_MOVETAB:         
             sData << setw(20) << setfill(' ') << "(DT_MOVETAB)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          case DT_SYMINFO:         
             sData << setw(20) << setfill(' ') << "(DT_SYMINFO)"; 
-            sData << " Ptr: 0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
+            sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break;
          //case DT_ADDRRNGHI:     cout << "DT_ADDRRNGHI"       << endl; break;
       }
@@ -3583,7 +3585,7 @@ int C_App::show_GNU_Versym32(Elf32_Shdr* pSHead){
       if(val >= 0x8000) val &= 0xFF; // can't figure out what 0x80 means :o(
       sData << "0x"          << hex << right << uppercase << setw(4) << setfill('0') << n;
       sData << " Version:0x" << hex << uppercase << setw(4) << setfill('0') << val;
-      sData << " " << setw(20) << setfill(' ') << left << vGNUSymbol32[val].data();
+      sData << " " << setw(17) << setfill(' ') << left << vGNUSymbol32[val].data();
       if(!((n + 1) % 4)) sData << endl;
    }
    

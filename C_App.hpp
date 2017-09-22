@@ -94,23 +94,20 @@
        
        C_TreeView CTV_ELF{C_TREEVIEW_ELF}, CTV_Program{C_TREEVIEW_PRO}, CTV_Section{C_TREEVIEW_SEC};
        
-       ////////////////////////
-
+       //////////////////////////////////
        //Signal handlers:
        void on_button_open();
        void on_notebook_switch_page(Gtk::Widget* page, guint page_num);
        bool on_configure_changed(GdkEventConfigure* configure_event);
        
-       ////////////////////////
-       
-       string sFile;
-       
-       ////////////////////////
-       
+       //////////////////////////////////
        int open_file();
        
        char* pfile;
        
+       string sFile;
+       
+       //////////////////////////////////
        // 64Bit
        Elf64_Ehdr* pElf64;
        Elf64_Phdr* pPHead64;
@@ -140,15 +137,14 @@
        
        bool bShnum64; // true if pElf64->e_shnum == SHN_UNDEF
        
-       ////////////////////////
-       //32Bit
-       
-       int read32bit(char* pfile);
-              
+       //////////////////////////////
+       //32Bit     
        Elf32_Ehdr* pElf32;
        Elf32_Phdr* pPHead32;
        Elf32_Shdr* pSHead32;
        Elf32_Shdr* pSHStr32;
+       
+       int read32bit(char* pfile);
        
        int show_ELF32_Head();
        int show_ELF32_PHead();
@@ -171,7 +167,7 @@
        
        bool bShnum32; // true if pElf32->e_shnum == SHN_UNDEF
        
-       /////////////////////////////
+       /////////////////////////////////
        
        Gtk::TreeModel::Row appand(Gtk::TreeModel::Row* pParent, SAppend* pSAppend);
  };

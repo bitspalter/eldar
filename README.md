@@ -1,6 +1,6 @@
 # eldar (alpha)
 
-ELF-Viewer(x86-64)
+ELF-Viewer
 
 1. compile:
 g++ *.cpp -std=c++11 -no-pie -o eldar -Wall `pkg-config gtkmm-3.0 --cflags --libs`
