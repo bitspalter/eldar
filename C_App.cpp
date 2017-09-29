@@ -9,118 +9,214 @@
 //////////////////////////////////////////////////////////////////////////////////
 C_App::C_App(){
 
-   this->resize(750, 500);
-   
+   this->set_default_size(920, 600);
+
    //////////////////////////////////////////////////////////////
    // Button
    sbutton.open.set_label("open");
    sbutton.open.set_size_request(110, 30);
    sbutton.open.signal_clicked().connect(sigc::mem_fun(*this, &C_App::on_button_open));
    
-   ////////////////
+   ///////////////////////////////////
+   // TreeView 
+   stview.Elf.view.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &C_App::on_tv_elf_changed));
+   stview.Pro.view.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &C_App::on_tv_pro_changed));
+   stview.Sec.view.get_selection()->signal_changed().connect(sigc::mem_fun(*this, &C_App::on_tv_sec_changed));
 
-   Pango::FontDescription fdsc("Courier New 10"); 
-  
-   m_TV_Relocation.override_font(fdsc);
-   m_TV_SymTab.override_font(fdsc);
-   m_TV_Dynamic.override_font(fdsc);
-   m_TV_Note.override_font(fdsc);
-   m_TV_String.override_font(fdsc);
-   m_TV_Gnu_Verdef.override_font(fdsc);
-   m_TV_Gnu_Verneed.override_font(fdsc);
-   m_TV_Gnu_Versym.override_font(fdsc);
+   stview.Elf.window.add(stview.Elf.view);
+   stview.Elf.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   
+   stview.Pro.window.add(stview.Pro.view);
+   stview.Pro.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   
+   stview.Sec.window.add(stview.Sec.view);
+   stview.Sec.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   
+   ////////////////////////////////////
+   // Section
    
    Gdk::RGBA colorB = Gdk::RGBA("#232729");
    Gdk::RGBA colorF = Gdk::RGBA("#777777");
    
-   m_TV_Relocation.override_color(colorF);
-   m_TV_SymTab.override_color(colorF);
-   m_TV_Dynamic.override_color(colorF);
-   m_TV_Note.override_color(colorF);
-   m_TV_String.override_color(colorF);
-   m_TV_Gnu_Verdef.override_color(colorF);
-   m_TV_Gnu_Verneed.override_color(colorF);
-   m_TV_Gnu_Versym.override_color(colorF);
+   Pango::FontDescription fdsc("Courier New 10"); 
    
-   m_TV_Relocation.override_background_color(colorB);
-   m_TV_SymTab.override_background_color(colorB);
-   m_TV_Dynamic.override_background_color(colorB);
-   m_TV_Note.override_background_color(colorB);
-   m_TV_String.override_background_color(colorB);
-   m_TV_Gnu_Verdef.override_background_color(colorB);
-   m_TV_Gnu_Verneed.override_background_color(colorB);
-   m_TV_Gnu_Versym.override_background_color(colorB);
+   ssection.Relocation.pbuffer = Gtk::TextBuffer::create();
+   ssection.Relocation.view.set_buffer(ssection.Relocation.pbuffer);
+   ssection.Relocation.view.override_font(fdsc);
+   ssection.Relocation.view.override_color(colorF);
+   ssection.Relocation.view.override_background_color(colorB);
+   ssection.Relocation.window.add(ssection.Relocation.view);
+   ssection.Relocation.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   //////////////////////////////////////////////////////////////
+   ssection.SymTab.pbuffer = Gtk::TextBuffer::create();
+   ssection.SymTab.view.set_buffer(ssection.SymTab.pbuffer);
+   ssection.SymTab.view.override_font(fdsc);
+   ssection.SymTab.view.override_color(colorF);
+   ssection.SymTab.view.override_background_color(colorB);
+   ssection.SymTab.window.add(ssection.SymTab.view);
+   ssection.SymTab.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   m_SW_Elf.add(CTV_ELF);
-   m_SW_Elf.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   ssection.Dynamic.pbuffer = Gtk::TextBuffer::create();
+   ssection.Dynamic.view.set_buffer(ssection.Dynamic.pbuffer);
+   ssection.Dynamic.view.override_font(fdsc);
+   ssection.Dynamic.view.override_color(colorF);
+   ssection.Dynamic.view.override_background_color(colorB);
+   ssection.Dynamic.window.add(ssection.Dynamic.view);
+   ssection.Dynamic.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   m_SW_Pro.add(CTV_Program);
-   m_SW_Pro.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   ssection.Note.pbuffer = Gtk::TextBuffer::create();
+   ssection.Note.view.set_buffer(ssection.Note.pbuffer);
+   ssection.Note.view.override_font(fdsc);
+   ssection.Note.view.override_color(colorF);
+   ssection.Note.view.override_background_color(colorB);
+   ssection.Note.window.add(ssection.Note.view);
+   ssection.Note.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   m_SW_Sec.add(CTV_Section);
-   m_SW_Sec.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   ssection.String.pbuffer = Gtk::TextBuffer::create();
+   ssection.String.view.set_buffer(ssection.String.pbuffer);
+   ssection.String.view.override_font(fdsc);
+   ssection.String.view.override_color(colorF);
+   ssection.String.view.override_background_color(colorB);
+   ssection.String.window.add(ssection.String.view);
+   ssection.String.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   //////////////////////////
+   ssection.Gnu_Verdef.pbuffer = Gtk::TextBuffer::create();
+   ssection.Gnu_Verdef.view.set_buffer(ssection.Gnu_Verdef.pbuffer);
+   ssection.Gnu_Verdef.view.override_font(fdsc);
+   ssection.Gnu_Verdef.view.override_color(colorF);
+   ssection.Gnu_Verdef.view.override_background_color(colorB);
+   ssection.Gnu_Verdef.window.add(ssection.Gnu_Verdef.view);
+   ssection.Gnu_Verdef.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   m_SW_Relocation.add(m_TV_Relocation);
-   m_SW_Relocation.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   ssection.Gnu_Verneed.pbuffer = Gtk::TextBuffer::create();
+   ssection.Gnu_Verneed.view.set_buffer(ssection.Gnu_Verneed.pbuffer);
+   ssection.Gnu_Verneed.view.override_font(fdsc);
+   ssection.Gnu_Verneed.view.override_color(colorF);
+   ssection.Gnu_Verneed.view.override_background_color(colorB);
+   ssection.Gnu_Verneed.window.add(ssection.Gnu_Verneed.view);
+   ssection.Gnu_Verneed.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
    
-   m_SW_SymTab.add(m_TV_SymTab);
-   m_SW_SymTab.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-   
-   m_SW_Dynamic.add(m_TV_Dynamic);
-   m_SW_Dynamic.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-   
-   m_SW_Note.add(m_TV_Note);
-   m_SW_Note.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   ssection.Gnu_Versym.pbuffer = Gtk::TextBuffer::create();
+   ssection.Gnu_Versym.view.set_buffer(ssection.Gnu_Versym.pbuffer);
+   ssection.Gnu_Versym.view.override_font(fdsc);
+   ssection.Gnu_Versym.view.override_color(colorF);
+   ssection.Gnu_Versym.view.override_background_color(colorB);
+   ssection.Gnu_Versym.window.add(ssection.Gnu_Versym.view);
+   ssection.Gnu_Versym.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
-   m_SW_String.add(m_TV_String);
-   m_SW_String.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   //////////////////////////////////////////////////////////////
+   // Hex
    
-   m_SW_Gnu_Verdef.add(m_TV_Gnu_Verdef);
-   m_SW_Gnu_Verdef.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   Pango::FontDescription fHex("Courier New 14");
    
-   m_SW_Gnu_Verneed.add(m_TV_Gnu_Verneed);
-   m_SW_Gnu_Verneed.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   // Tag ////////////////////////
+   stag.BG_White = Gtk::TextBuffer::Tag::create();
+   stag.BG_White->property_background() = "#777777";
    
-   m_SW_Gnu_Versym.add(m_TV_Gnu_Versym);
-   m_SW_Gnu_Versym.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   stag.BG_Black = Gtk::TextBuffer::Tag::create();
+   stag.BG_Black->property_background() = "#232729";
    
+   stag.FG_Black = Gtk::TextBuffer::Tag::create();
+   stag.FG_Black->property_foreground() = "#232729";
+   
+   stag.FG_Green = Gtk::TextBuffer::Tag::create();
+   stag.FG_Green->property_foreground() = "#23AA29";
+   
+   // TagTable ////////////////////
+   stag.Table = Gtk::TextBuffer::TagTable::create();
+   stag.Table->add(stag.BG_White);
+   stag.Table->add(stag.BG_Black);
+   stag.Table->add(stag.FG_Black);
+   stag.Table->add(stag.FG_Green);
+   
+   // Text ////////////////////////
+   shex.ElfHead.pbuffer = Gtk::TextBuffer::create(stag.Table);
+   shex.ElfHead.window.add(shex.ElfHead.view);
+   shex.ElfHead.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   shex.ElfHead.window.set_border_width(10);
+   shex.ElfHead.view.override_font(fHex);
+   shex.ElfHead.view.set_buffer(shex.ElfHead.pbuffer);
+   shex.ElfHead.view.override_color(colorF);
+   shex.ElfHead.view.override_background_color(colorB);
+   
+   spaned.VElf.add1(stview.Elf.window);
+   spaned.VElf.add2(shex.ElfHead.window);
+   spaned.VElf.set_position(300);
+   
+   /////////////////////////////////
+   shex.ProHead.pbuffer = Gtk::TextBuffer::create(stag.Table);
+   shex.ProHead.window.add(shex.ProHead.view);
+   shex.ProHead.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   shex.ProHead.window.set_border_width(10);
+   shex.ProHead.view.override_font(fHex);
+   shex.ProHead.view.set_buffer(shex.ProHead.pbuffer);
+   shex.ProHead.view.override_color(colorF);
+   shex.ProHead.view.override_background_color(colorB);
+   
+   shex.ProFile.pbuffer = Gtk::TextBuffer::create();
+   shex.ProFile.window.add(shex.ProFile.view);
+   shex.ProFile.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   shex.ProFile.window.set_border_width(10);
+   shex.ProFile.view.override_font(fHex);
+   shex.ProFile.view.set_buffer(shex.ProFile.pbuffer);
+   shex.ProFile.view.override_color(colorF);
+   shex.ProFile.view.override_background_color(colorB);
+   
+   spaned.HPro.add1(shex.ProHead.window);
+   spaned.HPro.add2(shex.ProFile.window);
+   spaned.HPro.set_position(460);
+   
+   spaned.VPro.add1(stview.Pro.window);
+   spaned.VPro.add2(spaned.HPro);
+   spaned.VPro.set_position(300);
+   
+   /////////////////////////////////
+   shex.SecHead.pbuffer = Gtk::TextBuffer::create(stag.Table);
+   shex.SecHead.window.add(shex.SecHead.view);
+   shex.SecHead.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   shex.SecHead.window.set_border_width(10);
+   shex.SecHead.view.override_font(fHex);
+   shex.SecHead.view.set_buffer(shex.SecHead.pbuffer);
+   shex.SecHead.view.override_color(colorF);
+   shex.SecHead.view.override_background_color(colorB);
+   
+   shex.SecFile.pbuffer = Gtk::TextBuffer::create();
+   shex.SecFile.window.add(shex.SecFile.view);
+   shex.SecFile.window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+   shex.SecFile.window.set_border_width(10);
+   shex.SecFile.view.override_font(fHex);
+   shex.SecFile.view.set_buffer(shex.SecFile.pbuffer);
+   shex.SecFile.view.override_color(colorF);
+   shex.SecFile.view.override_background_color(colorB);
+   
+   spaned.HSec.add1(shex.SecHead.window);
+   spaned.HSec.add2(shex.SecFile.window);
+   spaned.HSec.set_position(460);
+   
+   spaned.VSec.add1(stview.Sec.window);
+   spaned.VSec.add2(spaned.HSec);
+   spaned.VSec.set_position(300);
+
    //////////////////////////////////////////////////////////////
    // Notebook
-   m_NB_Main.append_page(m_SW_Elf, "ELF header");
-   m_NB_Main.append_page(m_SW_Pro, "Program header");
-   m_NB_Main.append_page(m_SW_Sec, "Section header");
-   m_NB_Main.append_page(m_VB_Sec, "Section");
-   
-   m_NB_Main.signal_switch_page().connect(sigc::mem_fun(*this, &C_App::on_notebook_switch_page));
+   m_NB_Main.append_page(spaned.VElf, "ELF header");
+   m_NB_Main.append_page(spaned.VPro, "Program header");
+   m_NB_Main.append_page(spaned.VSec, "Section header");
+   m_NB_Main.append_page(m_VB_Sec,    "Section");
 
    ///////////////////////////
-   
-   m_NB_Sec.append_page(m_SW_Relocation,  "Relocation");
-   m_NB_Sec.append_page(m_SW_SymTab,      "Symbol Table");
-   m_NB_Sec.append_page(m_SW_Dynamic,     "Dynamic");
-   m_NB_Sec.append_page(m_SW_Note,        "Notes");
-   m_NB_Sec.append_page(m_SW_String,      "Strings");
-   m_NB_Sec.append_page(m_SW_Gnu_Verdef,  "GNU Verdef");
-   m_NB_Sec.append_page(m_SW_Gnu_Verneed, "GNU Verneed");
-   m_NB_Sec.append_page(m_SW_Gnu_Versym,  "GNU Versym");
+
+   m_NB_Sec.append_page(ssection.Relocation.window,  "Relocation");
+   m_NB_Sec.append_page(ssection.SymTab.window,      "Symbol Table");
+   m_NB_Sec.append_page(ssection.Dynamic.window,     "Dynamic");
+   m_NB_Sec.append_page(ssection.Note.window,        "Notes");
+   m_NB_Sec.append_page(ssection.String.window,      "Strings");
+   m_NB_Sec.append_page(ssection.Gnu_Verdef.window,  "GNU Verdef");
+   m_NB_Sec.append_page(ssection.Gnu_Verneed.window, "GNU Verneed");
+   m_NB_Sec.append_page(ssection.Gnu_Versym.window,  "GNU Versym");
    
    m_VB_Sec.pack_start(m_NB_Sec);
-   
-   //////////////////////////////////////////////////////////////
-   // TextBuffer
-   pTB_Relocation  = Gtk::TextBuffer::create();
-   pTB_SymTab      = Gtk::TextBuffer::create();
-   pTB_Dynamic     = Gtk::TextBuffer::create();
-   pTB_Note        = Gtk::TextBuffer::create();
-   pTB_String      = Gtk::TextBuffer::create();
-   pTB_Gnu_Verdef  = Gtk::TextBuffer::create();
-   pTB_Gnu_Verneed = Gtk::TextBuffer::create();
-   pTB_Gnu_Versym  = Gtk::TextBuffer::create();
-   
+
    //////////////////////////////////////////////////////////////
    // HeaderBar
    set_titlebar(m_header_bar);
@@ -146,7 +242,9 @@ C_App::C_App(){
    
    ////////////////////////
    
-   pfile    = nullptr;
+   bFile    = false;
+   
+   pFile    = nullptr;
    
    pElf64   = nullptr;
    pPHead64 = nullptr;
@@ -193,55 +291,46 @@ void C_App::on_button_open(){
    }
 }
 //////////////////////////////////////////////////////////////////////////////////
-// [ on_notebook_switch_page ]
-//////////////////////////////////////////////////////////////////////////////////
-void C_App::on_notebook_switch_page(Gtk::Widget* /* page */, guint page_num){
-   //cout << "Switched to tab with index " << page_num << endl;
-}
-//////////////////////////////////////////////////////////////////////////////////
 // [ open_file ]
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::open_file(){
-   uint64_t cFile = 0;
-   int file = -1;
+   
    struct stat st;
    
    ///////////////////////////////////////////////////////
    // clear everything   
    
-   CTV_ELF.m_refTreeModel->clear();
-   CTV_Program.m_refTreeModel->clear();
-   CTV_Section.m_refTreeModel->clear();
+   stview.Elf.view.m_refTreeModel->clear();
+   stview.Pro.view.m_refTreeModel->clear();
+   stview.Sec.view.m_refTreeModel->clear();
    
    ///////////////////////
    
-   pTB_Relocation->set_text("");
-   m_TV_Relocation.set_buffer(pTB_Relocation);
+   ssection.Relocation.pbuffer->set_text("");
+   ssection.SymTab.pbuffer->set_text("");
+   ssection.Dynamic.pbuffer->set_text("");
+   ssection.Note.pbuffer->set_text("");
+   ssection.String.pbuffer->set_text("");
+   ssection.Gnu_Verdef.pbuffer->set_text("");
+   ssection.Gnu_Verneed.pbuffer->set_text("");
+   ssection.Gnu_Versym.pbuffer->set_text("");
    
-   pTB_Dynamic->set_text("");
-   m_TV_Dynamic.set_buffer(pTB_Dynamic);
+   ///////////////////////
    
-   pTB_SymTab->set_text("");
-   m_TV_SymTab.set_buffer(pTB_SymTab);
-   
-   pTB_Note->set_text("");
-   m_TV_Note.set_buffer(pTB_Note);
-
-   pTB_String->set_text("");
-   m_TV_String.set_buffer(pTB_String);
-   
-   pTB_Gnu_Verdef->set_text("");
-   m_TV_Gnu_Verdef.set_buffer(pTB_Gnu_Verdef);
-   
-   pTB_Gnu_Verneed->set_text("");
-   m_TV_Gnu_Verneed.set_buffer(pTB_Gnu_Verneed);
-   
-   pTB_Gnu_Versym->set_text("");
-   m_TV_Gnu_Versym.set_buffer(pTB_Gnu_Versym);
+   shex.ElfHead.pbuffer->set_text("");
+   shex.ProHead.pbuffer->set_text("");
+   shex.ProFile.pbuffer->set_text("");
+   shex.SecHead.pbuffer->set_text("");
+   shex.SecFile.pbuffer->set_text("");
    
    ///////////////////////
 
-   pfile = nullptr;
+   if(bFile){
+      munmap(pFile, st.st_size);
+      ::close(hFile);
+      bFile = false;
+      pFile = nullptr;
+   }
    
    ///////////////////////
    
@@ -282,56 +371,54 @@ int C_App::open_file(){
    
    cout << "Name:" << sFile.data() << " Size:" << cFile << " bytes" << endl;
    
-   if((file = open(sFile.data(), O_RDONLY)) == -1){
+   if((hFile = open(sFile.data(), O_RDONLY)) == -1){
       m_header_bar.set_subtitle("ERROR: open(file)");
       return(C_APP_ERROR); 
    }
    
-   if((pfile = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, file, 0)) == MAP_FAILED){
+   if((pFile = (char*)mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, hFile, 0)) == MAP_FAILED){
       m_header_bar.set_subtitle("ERROR: mmap(file)");
       return(C_APP_ERROR);  
    }
    
    //////////////////////////////////////////////////
    
-   if(*((int32_t*)(&pfile[0])) != magic){
+   bFile = true;
+   
+   //////////////////////////////////////////////////
+   
+   if(*((int32_t*)(&pFile[0])) != magic){
       m_header_bar.set_subtitle("ERROR: no ELF file");
       return(C_APP_ERROR); 
    }
 
-   if(pfile[EI_CLASS] == ELFCLASS32) read32bit(pfile);
+   if(pFile[EI_CLASS] == ELFCLASS32) read32bit();
    else
-   if(pfile[EI_CLASS] == ELFCLASS64) read64bit(pfile);
+   if(pFile[EI_CLASS] == ELFCLASS64) read64bit();
    else m_header_bar.set_subtitle("ERROR: ELFCLASS32 unsupported");
-       
-   //////////////////////////////////////////////////
-   
-   munmap(pfile, st.st_size);
-   
-   ::close(file);
-   
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
 // [ read64bit ]
 //////////////////////////////////////////////////////////////////////////////////
-int C_App::read64bit(char* pfile){
+int C_App::read64bit(){
 
    //cout << "show_ELF64_Head" << endl;
    
-   pElf64 = (Elf64_Ehdr*)pfile;
+   pElf64 = (Elf64_Ehdr*)pFile;
    
    show_ELF64_Head();
    
    //cout << "show_ELF64_PHead" << endl;
       
-   pPHead64 = (Elf64_Phdr*)(pfile + pElf64->e_phoff);
+   pPHead64 = (Elf64_Phdr*)(pFile + pElf64->e_phoff);
    
    show_ELF64_PHead();
    
    //cout << "show_ELF64_SHead" << endl;
       
-   pSHead64 = (Elf64_Shdr*)(pfile + pElf64->e_shoff);
+   pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
    
    if(pElf64->e_shstrndx != SHN_UNDEF)
       pSHStr64 = &pSHead64[pElf64->e_shstrndx];
@@ -340,7 +427,7 @@ int C_App::read64bit(char* pfile){
    
    //cout << "show_Section64" << endl;
       
-   pSHead64 = (Elf64_Shdr*)(pfile + pElf64->e_shoff);
+   pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
    
    show_Section64();
    
@@ -349,32 +436,32 @@ int C_App::read64bit(char* pfile){
 //////////////////////////////////////////////////////////////////////////////////
 // [ read32bit ]
 //////////////////////////////////////////////////////////////////////////////////
-int C_App::read32bit(char* pfile){
+int C_App::read32bit(){
     
-   cout << "show_ELF32_Head" << endl;
+   //cout << "show_ELF32_Head" << endl;
    
-   pElf32 = (Elf32_Ehdr*)pfile;
+   pElf32 = (Elf32_Ehdr*)pFile;
    
    show_ELF32_Head();
    
-   cout << "show_ELF32_PHead" << endl;
+   //cout << "show_ELF32_PHead" << endl;
       
-   pPHead32 = (Elf32_Phdr*)(pfile + pElf32->e_phoff);
+   pPHead32 = (Elf32_Phdr*)(pFile + pElf32->e_phoff);
    
    show_ELF32_PHead();
    
-   cout << "show_ELF32_SHead" << endl;
+   //cout << "show_ELF32_SHead" << endl;
       
-   pSHead32 = (Elf32_Shdr*)(pfile + pElf32->e_shoff);
+   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
    
    if(pElf32->e_shstrndx != SHN_UNDEF)
       pSHStr32 = &pSHead32[pElf32->e_shstrndx];
 
    show_ELF32_SHead();
    
-   cout << "show_Section32" << endl;
+   //cout << "show_Section32" << endl;
       
-   pSHead32 = (Elf32_Shdr*)(pfile + pElf32->e_shoff);
+   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
    
    show_Section32();
    
@@ -391,7 +478,7 @@ int C_App::show_ELF64_Head(){
    
    SAppend sAppend;
    
-   sAppend.pTreeView = &CTV_ELF;
+   sAppend.pTreeView = &stview.Elf.view;
    sAppend.pNumber   = &sNumber;
    sAppend.pOffset   = &sOffset;
    sAppend.pSize     = &sSize;
@@ -714,6 +801,10 @@ int C_App::show_ELF64_Head(){
    appand(nullptr, &sAppend);
 
    Offset += 2;
+   
+   //////////////////////////////////
+   
+   show_hex(&shex.ElfHead.view, 0, sizeof(Elf64_Ehdr));
 
    return(C_APP_READY);  
 }
@@ -732,7 +823,7 @@ int C_App::show_ELF64_PHead(){
    
    SAppend sAppend;
    
-   sAppend.pTreeView = &CTV_Program;
+   sAppend.pTreeView = &stview.Pro.view;
    sAppend.pNumber   = &sNumber;
    sAppend.pOffset   = &sOffset;
    sAppend.pSize     = &sSize;
@@ -877,7 +968,7 @@ int C_App::show_ELF64_SHead(){
    
    SAppend sAppend;
    
-   sAppend.pTreeView = &CTV_Section;
+   sAppend.pTreeView = &stview.Sec.view;
    sAppend.pNumber   = &sNumber;
    sAppend.pOffset   = &sOffset;
    sAppend.pSize     = &sSize;
@@ -900,7 +991,7 @@ int C_App::show_ELF64_SHead(){
       sValue   << "0x"          << hex << uppercase << setw(8)  << setfill('0') << pSHead64->sh_name;
       
       if(pSHStr64 != nullptr)
-         sMeaning << "Name: " << (char*)(pfile + pSHStr64->sh_offset + pSHead64->sh_name); 
+         sMeaning << "Name: " << (char*)(pFile + pSHStr64->sh_offset + pSHead64->sh_name); 
       else
          sMeaning << "Name: Unknown";
       
@@ -1113,7 +1204,7 @@ Gtk::TreeModel::Row C_App::appand(Gtk::TreeModel::Row* pParent, SAppend* pSAppen
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::show_Section64(){
     
-   Elf64_Shdr* pSHead = (Elf64_Shdr*)(pfile + pElf64->e_shoff);
+   Elf64_Shdr* pSHead = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
    
    int shnum = 0;
    
@@ -1176,49 +1267,49 @@ int C_App::show_Section64(){
    
    ///////////////////////////////////////////////////////////
    
-   cout << "show_Dynamic64" << endl;
+   //cout << "show_Dynamic64" << endl;
       
    for(auto pSHead: vDynamic) show_Dynamic64(pSHead);
     
    //////////////////////////////////
    
-   cout << "show_Relocation64" << endl;
+   //cout << "show_Relocation64" << endl;
    
    for(auto pSHead: vRelocation) show_Relocation64(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_SymTab64" << endl;
+   //cout << "show_SymTab64" << endl;
    
    for(auto pSHead: vSymTab) show_SymTab64(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_Note64" << endl;
+   //cout << "show_Note64" << endl;
    
    for(auto pSHead: vNote) show_Note64(pSHead); 
    
    //////////////////////////////////
    
-   cout << "show_String64" << endl;
+   //cout << "show_String64" << endl;
    
    for(auto pSHead: vStrings) show_String64(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_GNU_Verdef64" << endl;
+   //cout << "show_GNU_Verdef64" << endl;
    
    for(auto pSHead: vGDef) show_GNU_Verdef64(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_GNU_Verneed64" << endl;
+   //cout << "show_GNU_Verneed64" << endl;
    
    for(auto pSHead: vGNeed) show_GNU_Verneed64(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_GNU_Versym64" << endl;
+   //cout << "show_GNU_Versym64" << endl;
    
    for(auto pSHead: vGSym) show_GNU_Versym64(pSHead);
 
@@ -1238,27 +1329,27 @@ int C_App::show_Relocation64(Elf64_Shdr* pSHead){
    
    uint64_t Symbol = 0, Type = 0;
    
-   sData << m_TV_Relocation.get_buffer()->get_text().data();
-   
+   sData << ssection.Relocation.pbuffer->get_text().data();
+
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else 
       sData << "Name:Unknown" << endl;
  
    //////////////////////////////////////////////////
    
    if(pSHead->sh_type == SHT_RELA){
-      pRela = (Elf64_Rela*)(pfile + pSHead->sh_offset);
+      pRela = (Elf64_Rela*)(pFile + pSHead->sh_offset);
       cRelo = pSHead->sh_size / sizeof(Elf64_Rela);
    }else{
-      pRel  = (Elf64_Rel*)(pfile + pSHead->sh_offset);
+      pRel  = (Elf64_Rel*)(pFile + pSHead->sh_offset);
       cRelo = pSHead->sh_size / sizeof(Elf64_Rel);
    }
    
    Elf64_Shdr* pSymHead = &pSHead64[pSHead->sh_link];
    Elf64_Shdr* pStrHead = &pSHead64[pSymHead->sh_link];
    
-   Elf64_Sym* pSymTab = (Elf64_Sym*)(pfile + pSymHead->sh_offset);   
+   Elf64_Sym* pSymTab = (Elf64_Sym*)(pFile + pSymHead->sh_offset);   
    
    //////////////////////////////////////////////////
    
@@ -1325,7 +1416,7 @@ int C_App::show_Relocation64(Elf64_Shdr* pSHead){
          default:                       sData << setw(20) << setfill(' ') << left << "unknown";
       }
 
-      sData << " Symbol:" << (char*)(pfile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
+      sData << " Symbol:" << (char*)(pFile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
 
       if(pSHead->sh_type == SHT_RELA) pRela++;
       else                            pRel++;
@@ -1333,10 +1424,8 @@ int C_App::show_Relocation64(Elf64_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Relocation->set_text(sData.str());
-   
-   m_TV_Relocation.set_buffer(pTB_Relocation);
-   
+   ssection.Relocation.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -1346,16 +1435,16 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
     
    ostringstream sData;
    
-   sData << m_TV_Dynamic.get_buffer()->get_text().data();
+   sData << ssection.Dynamic.pbuffer->get_text().data();
       
    //////////////////////////////////////////////////
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
 
-   Elf64_Dyn* pDyn = (Elf64_Dyn*)(pfile + pSHead->sh_offset);
+   Elf64_Dyn* pDyn = (Elf64_Dyn*)(pFile + pSHead->sh_offset);
    
    int cDyn = pSHead->sh_size / sizeof(Elf64_Dyn); 
    
@@ -1369,7 +1458,7 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
       switch(pDyn->d_tag){
          case DT_NEEDED: 
             sData << setw(20) << setfill(' ') << "(DT_NEEDED)"; 
-            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pfile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pFile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
             break;   
          case DT_PLTRELSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PLTRELSZ)";
@@ -1427,6 +1516,9 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
             sData << setw(20) << setfill(' ') << "(DT_RPATH)"; 
             sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
+         case DT_SYMBOLIC:    
+            sData << setw(20) << setfill(' ') << "(DT_SYMBOLIC)" << endl; 
+            break;
          case DT_REL:             
             sData << setw(20) << setfill(' ') << "(DT_REL)"; 
             sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
@@ -1446,11 +1538,17 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
          case DT_DEBUG:           
             sData << setw(20) << setfill(' ') << "(DT_DEBUG)"; 
             sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
-            break; 
+            break;
+         case DT_TEXTREL:    
+            sData << setw(20) << setfill(' ') << "(DT_TEXTREL)" << endl; 
+            break;
          case DT_JMPREL:          
             sData << setw(20) << setfill(' ') << "(DT_JMPREL)"; 
             sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
+         case DT_BIND_NOW:    
+            sData << setw(20) << setfill(' ') << "(DT_BIND_NOW)" << endl; 
+            break;
          case DT_INIT_ARRAY:      
             sData << setw(20) << setfill(' ') << "(DT_INIT_ARRAY)"; 
             sData << " Ptr:0x" << setw(16) << setfill('0') << pDyn->d_un.d_ptr << endl;
@@ -1633,10 +1731,8 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
    
    //////////////////////////////////////////////////
    
-   pTB_Dynamic->set_text(sData.str());
-   
-   m_TV_Dynamic.set_buffer(pTB_Dynamic);
-   
+   ssection.Dynamic.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -1646,16 +1742,16 @@ int C_App::show_SymTab64(Elf64_Shdr* pSHead){
     
    ostringstream sData;
 
-   sData << m_TV_SymTab.get_buffer()->get_text().data();
+   sData << ssection.SymTab.pbuffer->get_text().data();
    
    //////////////////////////////////////////////////
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
        
-   Elf64_Sym* pSymTab = (Elf64_Sym*)(pfile + pSHead->sh_offset);
+   Elf64_Sym* pSymTab = (Elf64_Sym*)(pFile + pSHead->sh_offset);
    
    int cSymTab64 = pSHead->sh_size / sizeof(Elf64_Sym);
    
@@ -1710,16 +1806,14 @@ int C_App::show_SymTab64(Elf64_Shdr* pSHead){
       sData << " Value:0x" << setw(16) << setfill('0') << pSymTab->st_value;
       sData << " Size:0x"  << setw(16) << setfill('0') << pSymTab->st_size;
       
-      sData << " Name:" << (char*)(pfile + pStrHead->sh_offset + pSymTab->st_name) << endl;
+      sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pSymTab->st_name) << endl;
 
       pSymTab++;    
    }   
 
    //////////////////////////////////////////////////
    
-   pTB_SymTab->set_text(sData.str());
-   
-   m_TV_SymTab.set_buffer(pTB_SymTab);
+   ssection.SymTab.pbuffer->set_text(sData.str());
 
    return(C_APP_READY);  
 }
@@ -1732,10 +1826,10 @@ int C_App::show_Note64(Elf64_Shdr* pSHead){
    
    uint32_t Size = pSHead->sh_size, Offset = 0;
    
-   sData << m_TV_Note.get_buffer()->get_text().data();
+   sData << ssection.Note.pbuffer->get_text().data();
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
       
@@ -1743,7 +1837,7 @@ int C_App::show_Note64(Elf64_Shdr* pSHead){
    
    while(Size){
        
-      Elf64_Nhdr* pNote = (Elf64_Nhdr*)(pfile + pSHead->sh_offset + Offset);
+      Elf64_Nhdr* pNote = (Elf64_Nhdr*)(pFile + pSHead->sh_offset + Offset);
 
       sData << "Name:" << (char*)(pNote) + sizeof(Elf64_Nhdr);
 
@@ -1800,10 +1894,8 @@ int C_App::show_Note64(Elf64_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Note->set_text(sData.str());
-   
-   m_TV_Note.set_buffer(pTB_Note);
-   
+   ssection.Note.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -1814,10 +1906,10 @@ int C_App::show_String64(Elf64_Shdr* pSHead){
    ostringstream sData;
    uint64_t Size = pSHead->sh_size, Offset = pSHead->sh_offset;
    
-   sData << m_TV_String.get_buffer()->get_text().data();
+   sData << ssection.String.pbuffer->get_text().data();
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
        
@@ -1829,19 +1921,17 @@ int C_App::show_String64(Elf64_Shdr* pSHead){
     
       sData << "0x" << hex << uppercase << setw(4) << setfill('0') << n;    
       sData << " Offset:0x" << hex << uppercase << setw(16) << setfill('0') << Offset;
-      sData << " " << (char*)(pfile + Offset) << endl;
+      sData << " " << (char*)(pFile + Offset) << endl;
       
-      Size   -= strlen((char*)(pfile + Offset)) + 1;
-      Offset += strlen((char*)(pfile + Offset)) + 1;
+      Size   -= strlen((char*)(pFile + Offset)) + 1;
+      Offset += strlen((char*)(pFile + Offset)) + 1;
       n++;
    }
    
    //////////////////////////////////////////////////
    
-   pTB_String->set_text(sData.str());
-   
-   m_TV_String.set_buffer(pTB_String);
-   
+   ssection.String.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -1851,10 +1941,10 @@ int C_App::show_GNU_Verdef64(Elf64_Shdr* pSHead){
     
    ostringstream sData;
    
-   sData << m_TV_Gnu_Verdef.get_buffer()->get_text().data();
+   sData << ssection.Gnu_Verdef.pbuffer->get_text().data();
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
 
@@ -1869,7 +1959,7 @@ int C_App::show_GNU_Verdef64(Elf64_Shdr* pSHead){
    
    while(Size){
        
-      pVerdef = (Elf64_Verdef*)(pfile + pSHead->sh_offset + Offset); 
+      pVerdef = (Elf64_Verdef*)(pFile + pSHead->sh_offset + Offset); 
        
       sData << "Version:0x" << hex << setw(4) << setfill('0') << pVerdef->vd_version; 
       sData << " Count:0x"  << hex << setw(4) << setfill('0') << pVerdef->vd_cnt;
@@ -1883,11 +1973,11 @@ int C_App::show_GNU_Verdef64(Elf64_Shdr* pSHead){
        
       for(int n = 0; n < pVerdef->vd_cnt; n++){
          sData << "  name:0x" << hex << setw(8) << setfill('0') << pVerdaux->vda_name;     
-         sData << " " << (char*)(pfile + pStrHead->sh_offset + pVerdaux->vda_name) << endl; 
+         sData << " " << (char*)(pFile + pStrHead->sh_offset + pVerdaux->vda_name) << endl; 
          
          if(!n){
             if(pVerdef->vd_ndx > vGNUSymbol64.size() - 1) vGNUSymbol64.resize(pVerdef->vd_ndx + 10);
-            vGNUSymbol64[pVerdef->vd_ndx] = (char*)(pfile + pStrHead->sh_offset + pVerdaux->vda_name);   
+            vGNUSymbol64[pVerdef->vd_ndx] = (char*)(pFile + pStrHead->sh_offset + pVerdaux->vda_name);   
          }
          
          Size   -= sizeof(Elf64_Verdaux);
@@ -1900,10 +1990,8 @@ int C_App::show_GNU_Verdef64(Elf64_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Gnu_Verdef->set_text(sData.str());
-   
-   m_TV_Gnu_Verdef.set_buffer(pTB_Gnu_Verdef);
-   
+   ssection.Gnu_Verdef.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -1913,10 +2001,10 @@ int C_App::show_GNU_Verneed64(Elf64_Shdr* pSHead){
     
    ostringstream sData;
 
-   sData << m_TV_Gnu_Verneed.get_buffer()->get_text().data();
+   sData << ssection.Gnu_Verneed.pbuffer->get_text().data();
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
    
@@ -1930,10 +2018,10 @@ int C_App::show_GNU_Verneed64(Elf64_Shdr* pSHead){
    uint32_t Size = pSHead->sh_size, Offset = 0;
 
    while(Size){   
-      pVerneed = (Elf64_Verneed*)(pfile + pSHead->sh_offset + Offset);
+      pVerneed = (Elf64_Verneed*)(pFile + pSHead->sh_offset + Offset);
       sData << "Version:0x" << hex << setw(4) << setfill('0') << pVerneed->vn_version;
       sData << " Count:0x"  << hex << setw(4) << setfill('0') << pVerneed->vn_cnt;
-      sData << " Name:" << (char*)(pfile + pStrHead->sh_offset + pVerneed->vn_file) << endl;
+      sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pVerneed->vn_file) << endl;
 
       Size   -= sizeof(Elf64_Verneed);
       Offset += sizeof(Elf64_Verneed);
@@ -1944,10 +2032,10 @@ int C_App::show_GNU_Verneed64(Elf64_Shdr* pSHead){
          sData << "  Hash:0x" << hex << setw(8) << setfill('0') << pVernaux->vna_hash; 
          sData << " Flags:0x" << hex << setw(4) << setfill('0') << pVernaux->vna_flags;
          sData << " Other:0x" << hex << setw(4) << setfill('0') << pVernaux->vna_other;
-         sData << " Name:" << (char*)(pfile + pStrHead->sh_offset + pVernaux->vna_name) << endl;
+         sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pVernaux->vna_name) << endl;
          
          if(pVernaux->vna_other > vGNUSymbol64.size() - 1) vGNUSymbol64.resize(pVernaux->vna_other + 10);
-         vGNUSymbol64[pVernaux->vna_other] = (char*)(pfile + pStrHead->sh_offset + pVernaux->vna_name);
+         vGNUSymbol64[pVernaux->vna_other] = (char*)(pFile + pStrHead->sh_offset + pVernaux->vna_name);
          
          pVernaux++;
          
@@ -1958,10 +2046,8 @@ int C_App::show_GNU_Verneed64(Elf64_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Gnu_Verneed->set_text(sData.str());
-   
-   m_TV_Gnu_Verneed.set_buffer(pTB_Gnu_Verneed);
-   
+   ssection.Gnu_Verneed.pbuffer->set_text(sData.str());
+ 
    return(C_APP_READY);
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -1971,16 +2057,16 @@ int C_App::show_GNU_Versym64(Elf64_Shdr* pSHead){
     
    ostringstream sData;
 
-   sData << m_TV_Gnu_Versym.get_buffer()->get_text().data();
+   sData << ssection.Gnu_Versym.pbuffer->get_text().data();
    
    if(pSHStr64 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
        
    ////////////////////////////////////////////////// 
 
-   Elf64_Half* pVerdef = (Elf64_Half*)(pfile + pSHead->sh_offset);
+   Elf64_Half* pVerdef = (Elf64_Half*)(pFile + pSHead->sh_offset);
    
    int cSym = pSHead->sh_size / sizeof(Elf64_Half);
    
@@ -1995,10 +2081,8 @@ int C_App::show_GNU_Versym64(Elf64_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Gnu_Versym->set_text(sData.str());
-   
-   m_TV_Gnu_Versym.set_buffer(pTB_Gnu_Versym);
-   
+   ssection.Gnu_Versym.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -2022,7 +2106,7 @@ int C_App::show_ELF32_Head(){
    
    SAppend sAppend;
    
-   sAppend.pTreeView = &CTV_ELF;
+   sAppend.pTreeView = &stview.Elf.view;
    sAppend.pNumber   = &sNumber;
    sAppend.pOffset   = &sOffset;
    sAppend.pSize     = &sSize;
@@ -2345,7 +2429,11 @@ int C_App::show_ELF32_Head(){
    appand(nullptr, &sAppend);
 
    Offset += 2;
-
+   
+   //////////////////////////////////
+   
+   show_hex(&shex.ElfHead.view, 0, sizeof(Elf32_Ehdr));
+   
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -2363,7 +2451,7 @@ int C_App::show_ELF32_PHead(){
    
    SAppend sAppend;
    
-   sAppend.pTreeView = &CTV_Program;
+   sAppend.pTreeView = &stview.Pro.view;
    sAppend.pNumber   = &sNumber;
    sAppend.pOffset   = &sOffset;
    sAppend.pSize     = &sSize;
@@ -2508,7 +2596,7 @@ int C_App::show_ELF32_SHead(){
    
    SAppend sAppend;
    
-   sAppend.pTreeView = &CTV_Section;
+   sAppend.pTreeView = &stview.Sec.view;
    sAppend.pNumber   = &sNumber;
    sAppend.pOffset   = &sOffset;
    sAppend.pSize     = &sSize;
@@ -2531,7 +2619,7 @@ int C_App::show_ELF32_SHead(){
       sValue   << "0x"          << hex << uppercase << setw(8) << setfill('0') << pSHead32->sh_name;
       
       if(pSHStr32 != nullptr)
-         sMeaning << "Name: " << (char*)(pfile + pSHStr32->sh_offset + pSHead32->sh_name); 
+         sMeaning << "Name: " << (char*)(pFile + pSHStr32->sh_offset + pSHead32->sh_name); 
       else
          sMeaning << "Name: Unknown";
 
@@ -2708,7 +2796,7 @@ int C_App::show_ELF32_SHead(){
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::show_Section32(){
     
-   Elf32_Shdr* pSHead = (Elf32_Shdr*)(pfile + pElf32->e_shoff);
+   Elf32_Shdr* pSHead = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
    
    int shnum = 0;
    
@@ -2771,49 +2859,49 @@ int C_App::show_Section32(){
     
    ///////////////////////////////////////////////////////////
    
-   cout << "show_Dynamic32" << endl;
+   //cout << "show_Dynamic32" << endl;
       
    for(auto pSHead: vDynamic) show_Dynamic32(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_Relocation32" << endl;
+   //cout << "show_Relocation32" << endl;
    
    for(auto pSHead: vRelocation) show_Relocation32(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_SymTab32" << endl;
+   //cout << "show_SymTab32" << endl;
    
    for(auto pSHead: vSymTab) show_SymTab32(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_Note32" << endl;
+   //cout << "show_Note32" << endl;
    
    for(auto pSHead: vNote) show_Note32(pSHead); 
    
    //////////////////////////////////
    
-   cout << "show_String32" << endl;
+   //cout << "show_String32" << endl;
    
    for(auto pSHead: vStrings) show_String32(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_GNU_Verdef32" << endl;
+   //cout << "show_GNU_Verdef32" << endl;
    
    for(auto pSHead: vGDef) show_GNU_Verdef32(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_GNU_Verneed32" << endl;
+   //cout << "show_GNU_Verneed32" << endl;
    
    for(auto pSHead: vGNeed) show_GNU_Verneed32(pSHead);
    
    //////////////////////////////////
    
-   cout << "show_GNU_Versym32" << endl;
+   //cout << "show_GNU_Versym32" << endl;
    
    for(auto pSHead: vGSym) show_GNU_Versym32(pSHead);
    
@@ -2826,16 +2914,16 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
     
    ostringstream sData;
    
-   sData << m_TV_Dynamic.get_buffer()->get_text().data();
+   sData << ssection.Dynamic.pbuffer->get_text().data();
       
    //////////////////////////////////////////////////   
     
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
 
-   Elf32_Dyn* pDyn = (Elf32_Dyn*)(pfile + pSHead->sh_offset);
+   Elf32_Dyn* pDyn = (Elf32_Dyn*)(pFile + pSHead->sh_offset);
    
    int cDyn = pSHead->sh_size / sizeof(Elf64_Dyn); 
    
@@ -2849,7 +2937,7 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
       switch(pDyn->d_tag){
          case DT_NEEDED: 
             sData << setw(20) << setfill(' ') << "(DT_NEEDED)"; 
-            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pfile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pFile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
             break;   
          case DT_PLTRELSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PLTRELSZ)";
@@ -2907,6 +2995,9 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
             sData << setw(20) << setfill(' ') << "(DT_RPATH)"; 
             sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << endl;
             break;
+         case DT_SYMBOLIC:    
+            sData << setw(20) << setfill(' ') << "(DT_SYMBOLIC)" << endl; 
+            break;
          case DT_REL:             
             sData << setw(20) << setfill(' ') << "(DT_REL)"; 
             sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
@@ -2927,10 +3018,16 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
             sData << setw(20) << setfill(' ') << "(DT_DEBUG)"; 
             sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
+         case DT_TEXTREL:    
+            sData << setw(20) << setfill(' ') << "(DT_TEXTREL)" << endl; 
+            break;
          case DT_JMPREL:          
             sData << setw(20) << setfill(' ') << "(DT_JMPREL)"; 
             sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
             break; 
+         case DT_BIND_NOW:    
+            sData << setw(20) << setfill(' ') << "(DT_BIND_NOW)" << endl; 
+            break;
          case DT_INIT_ARRAY:      
             sData << setw(20) << setfill(' ') << "(DT_INIT_ARRAY)"; 
             sData << " Ptr:0x" << setw(8) << setfill('0') << pDyn->d_un.d_ptr << endl;
@@ -3113,10 +3210,8 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
    
    //////////////////////////////////////////////////
    
-   pTB_Dynamic->set_text(sData.str());
-   
-   m_TV_Dynamic.set_buffer(pTB_Dynamic);
-   
+   ssection.Dynamic.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3133,27 +3228,27 @@ int C_App::show_Relocation32(Elf32_Shdr* pSHead){
    
    uint32_t Symbol = 0, Type = 0;
    
-   sData << m_TV_Relocation.get_buffer()->get_text().data();
+   sData << ssection.Relocation.pbuffer->get_text().data();
    
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
    
    //////////////////////////////////////////////////  
     
    if(pSHead->sh_type == SHT_RELA){
-      pRela = (Elf32_Rela*)(pfile + pSHead->sh_offset);
+      pRela = (Elf32_Rela*)(pFile + pSHead->sh_offset);
       cRelo = pSHead->sh_size / sizeof(Elf32_Rela);
    }else{
-      pRel  = (Elf32_Rel*)(pfile + pSHead->sh_offset);
+      pRel  = (Elf32_Rel*)(pFile + pSHead->sh_offset);
       cRelo = pSHead->sh_size / sizeof(Elf32_Rel);
    }
    
    Elf32_Shdr* pSymHead = &pSHead32[pSHead->sh_link];
    Elf32_Shdr* pStrHead = &pSHead32[pSymHead->sh_link];
    
-   Elf32_Sym* pSymTab = (Elf32_Sym*)(pfile + pSymHead->sh_offset);
+   Elf32_Sym* pSymTab = (Elf32_Sym*)(pFile + pSymHead->sh_offset);
    
    //////////////////////////////////////////////////
    
@@ -3221,7 +3316,7 @@ int C_App::show_Relocation32(Elf32_Shdr* pSHead){
          default:                  sData << setw(20) << setfill(' ') << left << "unknown";
       }
 
-      sData << " Symbol:" << (char*)(pfile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
+      sData << " Symbol:" << (char*)(pFile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
 
       if(pSHead->sh_type == SHT_RELA) pRela++;
       else                            pRel++;
@@ -3229,10 +3324,8 @@ int C_App::show_Relocation32(Elf32_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Relocation->set_text(sData.str());
-   
-   m_TV_Relocation.set_buffer(pTB_Relocation);
-   
+   ssection.Relocation.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3242,16 +3335,16 @@ int C_App::show_SymTab32(Elf32_Shdr* pSHead){
     
    ostringstream sData;
 
-   sData << m_TV_SymTab.get_buffer()->get_text().data();
+   sData << ssection.SymTab.pbuffer->get_text().data();
    
    //////////////////////////////////////////////////  
     
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
        
-   Elf32_Sym* pSymTab = (Elf32_Sym*)(pfile + pSHead->sh_offset);
+   Elf32_Sym* pSymTab = (Elf32_Sym*)(pFile + pSHead->sh_offset);
    
    int cSymTab32 = pSHead->sh_size / sizeof(Elf32_Sym);
    
@@ -3306,17 +3399,15 @@ int C_App::show_SymTab32(Elf32_Shdr* pSHead){
       sData << " Value:0x" << setw(8) << setfill('0') << pSymTab->st_value;
       sData << " Size:0x"  << setw(8) << setfill('0') << pSymTab->st_size;
       
-      sData << " Name:" << (char*)(pfile + pStrHead->sh_offset + pSymTab->st_name) << endl;
+      sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pSymTab->st_name) << endl;
 
       pSymTab++;    
    }   
 
    //////////////////////////////////////////////////
    
-   pTB_SymTab->set_text(sData.str());
-   
-   m_TV_SymTab.set_buffer(pTB_SymTab);
-   
+   ssection.SymTab.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3328,10 +3419,10 @@ int C_App::show_Note32(Elf32_Shdr* pSHead){
    
    uint32_t Size = pSHead->sh_size, Offset = 0;
    
-   sData << m_TV_Note.get_buffer()->get_text().data();
+   sData << ssection.Note.pbuffer->get_text().data();
    
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
       
@@ -3339,7 +3430,7 @@ int C_App::show_Note32(Elf32_Shdr* pSHead){
     
    while(Size){
        
-      Elf32_Nhdr* pNote = (Elf32_Nhdr*)(pfile + pSHead->sh_offset + Offset);
+      Elf32_Nhdr* pNote = (Elf32_Nhdr*)(pFile + pSHead->sh_offset + Offset);
 
       sData << "Name:" << (char*)(pNote) + sizeof(Elf32_Nhdr);
 
@@ -3396,10 +3487,8 @@ int C_App::show_Note32(Elf32_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Note->set_text(sData.str());
-   
-   m_TV_Note.set_buffer(pTB_Note);
-   
+   ssection.Note.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3410,10 +3499,10 @@ int C_App::show_String32(Elf32_Shdr* pSHead){
    ostringstream sData;
    uint32_t Size = pSHead->sh_size, Offset = pSHead->sh_offset;
    
-   sData << m_TV_String.get_buffer()->get_text().data();
+   sData << ssection.String.pbuffer->get_text().data();
    
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
        
@@ -3425,19 +3514,17 @@ int C_App::show_String32(Elf32_Shdr* pSHead){
     
       sData << "0x" << hex << uppercase << setw(4) << setfill('0') << n;    
       sData << " Offset:0x" << hex << uppercase << setw(8) << setfill('0') << Offset;
-      sData << " " << (char*)(pfile + Offset) << endl;
+      sData << " " << (char*)(pFile + Offset) << endl;
       
-      Size   -= strlen((char*)(pfile + Offset)) + 1;
-      Offset += strlen((char*)(pfile + Offset)) + 1;
+      Size   -= strlen((char*)(pFile + Offset)) + 1;
+      Offset += strlen((char*)(pFile + Offset)) + 1;
       n++;
    }
     
    //////////////////////////////////////////////////
    
-   pTB_String->set_text(sData.str());
-   
-   m_TV_String.set_buffer(pTB_String);
-   
+   ssection.String.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3447,10 +3534,10 @@ int C_App::show_GNU_Verdef32(Elf32_Shdr* pSHead){
     
    ostringstream sData;
    
-   sData << m_TV_Gnu_Verdef.get_buffer()->get_text().data();
+   sData << ssection.Gnu_Verdef.pbuffer->get_text().data();
    
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
 
@@ -3465,7 +3552,7 @@ int C_App::show_GNU_Verdef32(Elf32_Shdr* pSHead){
     
    while(Size){
        
-      pVerdef = (Elf32_Verdef*)(pfile + pSHead->sh_offset + Offset); 
+      pVerdef = (Elf32_Verdef*)(pFile + pSHead->sh_offset + Offset); 
        
       sData << "Version:0x" << hex << setw(4) << setfill('0') << pVerdef->vd_version; 
       sData << " Count:0x"  << hex << setw(4) << setfill('0') << pVerdef->vd_cnt;
@@ -3479,11 +3566,11 @@ int C_App::show_GNU_Verdef32(Elf32_Shdr* pSHead){
        
       for(int n = 0; n < pVerdef->vd_cnt; n++){
          sData << "  name:0x" << hex << setw(8) << setfill('0') << pVerdaux->vda_name;     
-         sData << " " << (char*)(pfile + pStrHead->sh_offset + pVerdaux->vda_name) << endl; 
+         sData << " " << (char*)(pFile + pStrHead->sh_offset + pVerdaux->vda_name) << endl; 
          
          if(!n){
             if(pVerdef->vd_ndx > vGNUSymbol32.size() - 1) vGNUSymbol32.resize(pVerdef->vd_ndx + 10);
-            vGNUSymbol32[pVerdef->vd_ndx] = (char*)(pfile + pStrHead->sh_offset + pVerdaux->vda_name);   
+            vGNUSymbol32[pVerdef->vd_ndx] = (char*)(pFile + pStrHead->sh_offset + pVerdaux->vda_name);   
          }
          
          Size   -= sizeof(Elf32_Verdaux);
@@ -3496,10 +3583,8 @@ int C_App::show_GNU_Verdef32(Elf32_Shdr* pSHead){
    
    //////////////////////////////////////////////////
    
-   pTB_Gnu_Verdef->set_text(sData.str());
-   
-   m_TV_Gnu_Verdef.set_buffer(pTB_Gnu_Verdef);
-   
+   ssection.Gnu_Verdef.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3509,10 +3594,10 @@ int C_App::show_GNU_Verneed32(Elf32_Shdr* pSHead){
     
    ostringstream sData;
 
-   sData << m_TV_Gnu_Verneed.get_buffer()->get_text().data();
+   sData << ssection.Gnu_Verneed.pbuffer->get_text().data();
    
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
 
@@ -3526,10 +3611,10 @@ int C_App::show_GNU_Verneed32(Elf32_Shdr* pSHead){
    uint32_t Size = pSHead->sh_size, Offset = 0;
 
    while(Size){
-      pVerneed = (Elf32_Verneed*)(pfile + pSHead->sh_offset + Offset);
+      pVerneed = (Elf32_Verneed*)(pFile + pSHead->sh_offset + Offset);
       sData << "Version:0x" << hex << setw(4) << setfill('0') << pVerneed->vn_version;
       sData << " Count:0x"  << hex << setw(4) << setfill('0') << pVerneed->vn_cnt;
-      sData << " Name:" << (char*)(pfile + pStrHead->sh_offset + pVerneed->vn_file) << endl;
+      sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pVerneed->vn_file) << endl;
 
       Size   -= sizeof(Elf32_Verneed);
       Offset += sizeof(Elf32_Verneed);
@@ -3540,10 +3625,10 @@ int C_App::show_GNU_Verneed32(Elf32_Shdr* pSHead){
          sData << "  Hash:0x" << hex << setw(8) << setfill('0') << pVernaux->vna_hash; 
          sData << " Flags:0x" << hex << setw(4) << setfill('0') << pVernaux->vna_flags;
          sData << " Other:0x" << hex << setw(4) << setfill('0') << pVernaux->vna_other;
-         sData << " Name:" << (char*)(pfile + pStrHead->sh_offset + pVernaux->vna_name) << endl;
+         sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pVernaux->vna_name) << endl;
 
          if(pVernaux->vna_other > vGNUSymbol32.size() - 1) vGNUSymbol32.resize(pVernaux->vna_other + 10);
-         vGNUSymbol32[pVernaux->vna_other] = (char*)(pfile + pStrHead->sh_offset + pVernaux->vna_name);
+         vGNUSymbol32[pVernaux->vna_other] = (char*)(pFile + pStrHead->sh_offset + pVernaux->vna_name);
 
          Size   -= sizeof(Elf32_Vernaux);
          Offset += sizeof(Elf32_Vernaux);
@@ -3554,10 +3639,8 @@ int C_App::show_GNU_Verneed32(Elf32_Shdr* pSHead){
 
    //////////////////////////////////////////////////
    
-   pTB_Gnu_Verneed->set_text(sData.str());
-   
-   m_TV_Gnu_Verneed.set_buffer(pTB_Gnu_Verneed);
-   
+   ssection.Gnu_Verneed.pbuffer->set_text(sData.str());
+
    return(C_APP_READY);
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -3567,16 +3650,16 @@ int C_App::show_GNU_Versym32(Elf32_Shdr* pSHead){
     
    ostringstream sData;
 
-   sData << m_TV_Gnu_Versym.get_buffer()->get_text().data();
+   sData << ssection.Gnu_Versym.pbuffer->get_text().data();
    
    if(pSHStr32 != nullptr)
-      sData << "Name:" << (char*)(pfile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
+      sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
        
    ////////////////////////////////////////////////// 
     
-   Elf32_Half* pVerdef = (Elf32_Half*)(pfile + pSHead->sh_offset);
+   Elf32_Half* pVerdef = (Elf32_Half*)(pFile + pSHead->sh_offset);
    
    int cSym = pSHead->sh_size / sizeof(Elf32_Half);
 
@@ -3591,9 +3674,225 @@ int C_App::show_GNU_Versym32(Elf32_Shdr* pSHead){
    
    //////////////////////////////////////////////////
    
-   pTB_Gnu_Versym->set_text(sData.str());
-   
-   m_TV_Gnu_Versym.set_buffer(pTB_Gnu_Versym);
-   
+   ssection.Gnu_Versym.pbuffer->set_text(sData.str());
+
    return(C_APP_READY); 
+}
+//////////////////////////////////////////////////////////////////////////////////
+// [ on_tv_elf_changed ]  
+//////////////////////////////////////////////////////////////////////////////////
+void C_App::on_tv_elf_changed(){
+
+   shex.ElfHead.pbuffer->remove_all_tags(shex.ElfHead.pbuffer->begin(), shex.ElfHead.pbuffer->end());
+    
+   Gtk::TreeModel::iterator iter = stview.Elf.view.get_selection()->get_selected(); 
+   Gtk::TextBuffer::iterator iStart, iStop;
+
+   if(iter){
+      Gtk::TreeModel::Row row = *iter;
+
+      Glib::ustring strOffset = row[stview.Elf.view.m_Columns.m_col_offset];
+      Glib::ustring strSize   = row[stview.Elf.view.m_Columns.m_col_size];
+
+      uint64_t Offset = stoi(strOffset.data(), nullptr, 0);
+      uint64_t Size   = stoi(strSize.data(),   nullptr, 0);
+      uint64_t Teile = Offset / 16;
+      uint64_t Start = (Teile + 1) * 14 + Teile * 20 + Offset * 3;
+      uint64_t Stop = Start + Size * 3 - 1;
+      
+      iStart = shex.ElfHead.pbuffer->get_iter_at_offset(Start);
+      iStop  = shex.ElfHead.pbuffer->get_iter_at_offset(Stop);
+      
+      shex.ElfHead.pbuffer->apply_tag(stag.BG_Black, iStart, iStop); 
+      shex.ElfHead.pbuffer->apply_tag(stag.FG_Green, iStart, iStop);
+   }
+}
+//////////////////////////////////////////////////////////////////////////////////
+// [ on_tv_pro_changed ]  
+//////////////////////////////////////////////////////////////////////////////////
+void C_App::on_tv_pro_changed(){
+
+   shex.ProHead.pbuffer->remove_all_tags(shex.ProHead.pbuffer->begin(), shex.ProHead.pbuffer->end());
+   
+   Gtk::TreeModel::iterator iter = stview.Pro.view.get_selection()->get_selected();
+   Gtk::TextBuffer::iterator iStart, iStop;
+   
+   if(iter){
+      Gtk::TreeModel::Row row = *iter;
+      
+      Glib::ustring strOffset = row[stview.Pro.view.m_Columns.m_col_offset];
+      Glib::ustring strSize   = row[stview.Pro.view.m_Columns.m_col_size];
+      
+      uint64_t SegOffset = 0, SegSize = 0, OffsetHdr = 0, SizeHdr = 0;
+
+      Gtk::TreeModel::iterator iParent = row.parent();
+      
+      if(iParent){
+         Gtk::TreeModel::Row rParent= *iParent;
+         Glib::ustring strOffset = rParent[stview.Pro.view.m_Columns.m_col_offset];
+         OffsetHdr = stoi(strOffset.data(), nullptr, 0);
+
+         if(pFile[EI_CLASS] == ELFCLASS32){
+            SegOffset = ((Elf32_Phdr*)(pFile + OffsetHdr))->p_offset;
+            SegSize   = ((Elf32_Phdr*)(pFile + OffsetHdr))->p_filesz;
+            SizeHdr   = sizeof(Elf32_Phdr);
+         }else{
+            SegOffset = ((Elf64_Phdr*)(pFile + OffsetHdr))->p_offset;
+            SegSize   = ((Elf64_Phdr*)(pFile + OffsetHdr))->p_filesz;
+            SizeHdr   = sizeof(Elf64_Phdr);
+         }
+         
+         show_hex(&shex.ProHead.view, OffsetHdr, SizeHdr);
+         show_hex(&shex.ProFile.view, SegOffset, SegSize);
+         
+      }else{
+         OffsetHdr = stoi(strOffset.data(), nullptr, 0);
+         
+         if(pFile[EI_CLASS] == ELFCLASS32){
+            SegOffset = ((Elf32_Phdr*)(pFile + OffsetHdr))->p_offset;
+            SegSize   = ((Elf32_Phdr*)(pFile + OffsetHdr))->p_filesz;
+            SizeHdr   = sizeof(Elf32_Phdr);
+         }else{
+            SegOffset = ((Elf64_Phdr*)(pFile + OffsetHdr))->p_offset;
+            SegSize   = ((Elf64_Phdr*)(pFile + OffsetHdr))->p_filesz;
+            SizeHdr   = sizeof(Elf64_Phdr);
+         }
+         
+         show_hex(&shex.ProHead.view, OffsetHdr, SizeHdr);
+         show_hex(&shex.ProFile.view, SegOffset, SegSize);
+      }
+      
+      uint64_t Offset = stoi(strOffset.data(), nullptr, 0);
+      
+      Offset -= OffsetHdr;
+      
+      uint64_t Size   = stoi(strSize.data(),   nullptr, 0);
+      uint64_t Teile = Offset / 16;
+      uint64_t Start = (Teile + 1) * 14 + Teile * 20 + Offset * 3;
+      uint64_t Stop = Start + Size * 3 - 1;
+      
+      iStart = shex.ProHead.pbuffer->get_iter_at_offset(Start);
+      iStop  = shex.ProHead.pbuffer->get_iter_at_offset(Stop);
+      
+      shex.ProHead.pbuffer->apply_tag(stag.BG_Black, iStart, iStop); 
+      shex.ProHead.pbuffer->apply_tag(stag.FG_Green, iStart, iStop);
+   }
+}
+//////////////////////////////////////////////////////////////////////////////////
+// [ on_tv_sec_changed ]  
+//////////////////////////////////////////////////////////////////////////////////
+void C_App::on_tv_sec_changed(){
+
+   shex.SecHead.pbuffer->remove_all_tags(shex.SecHead.pbuffer->begin(), shex.SecHead.pbuffer->end());
+   
+   Gtk::TreeModel::iterator iter = stview.Sec.view.get_selection()->get_selected();
+   Gtk::TextBuffer::iterator iStart, iStop;
+   
+   if(iter){
+      Gtk::TreeModel::Row row = *iter;
+      
+      Glib::ustring strOffset = row[stview.Sec.view.m_Columns.m_col_offset];
+      Glib::ustring strSize   = row[stview.Sec.view.m_Columns.m_col_size];
+      
+      uint64_t SegOffset = 0, SegSize = 0, OffsetHdr = 0, SizeHdr = 0;
+      
+      Gtk::TreeModel::iterator iParent = row.parent();
+      
+      if(iParent){
+         Gtk::TreeModel::Row rParent= *iParent;
+         Glib::ustring strOffset = rParent[stview.Sec.view.m_Columns.m_col_offset];
+         OffsetHdr = stoi(strOffset.data(), nullptr, 0);
+         
+         if(pFile[EI_CLASS] == ELFCLASS32){
+            SegOffset = ((Elf32_Shdr*)(pFile + OffsetHdr))->sh_offset;
+            SegSize   = ((Elf32_Shdr*)(pFile + OffsetHdr))->sh_size;
+            SizeHdr   = sizeof(Elf32_Shdr);
+         }else{
+            SegOffset = ((Elf64_Shdr*)(pFile + OffsetHdr))->sh_offset;
+            SegSize   = ((Elf64_Shdr*)(pFile + OffsetHdr))->sh_size;
+            SizeHdr   = sizeof(Elf64_Shdr);
+         }
+         
+         show_hex(&shex.SecHead.view, OffsetHdr, SizeHdr);
+         show_hex(&shex.SecFile.view, SegOffset, SegSize);
+         
+      }else{
+         OffsetHdr = stoi(strOffset.data(), nullptr, 0);
+         
+         if(pFile[EI_CLASS] == ELFCLASS32){
+            SegOffset = ((Elf32_Shdr*)(pFile + OffsetHdr))->sh_offset;
+            SegSize   = ((Elf32_Shdr*)(pFile + OffsetHdr))->sh_size;
+            SizeHdr   = sizeof(Elf32_Shdr);
+         }else{
+            SegOffset = ((Elf64_Shdr*)(pFile + OffsetHdr))->sh_offset;
+            SegSize   = ((Elf64_Shdr*)(pFile + OffsetHdr))->sh_size;
+            SizeHdr   = sizeof(Elf64_Shdr);
+         }
+         
+         show_hex(&shex.SecHead.view, OffsetHdr, SizeHdr);
+         show_hex(&shex.SecFile.view, SegOffset, SegSize);
+      }
+      
+      uint64_t Offset = stoi(strOffset.data(), nullptr, 0);
+      
+      Offset -= OffsetHdr;
+      
+      uint64_t Size   = stoi(strSize.data(),   nullptr, 0);
+      uint64_t Teile = Offset / 16;
+      uint64_t Start = (Teile + 1) * 14 + Teile * 20 + Offset * 3;
+      uint64_t Stop = Start + Size * 3 - 1;
+      
+      iStart = shex.SecHead.pbuffer->get_iter_at_offset(Start);
+      iStop  = shex.SecHead.pbuffer->get_iter_at_offset(Stop);
+      
+      shex.SecHead.pbuffer->apply_tag(stag.BG_Black, iStart, iStop); 
+      shex.SecHead.pbuffer->apply_tag(stag.FG_Green, iStart, iStop);
+   }
+}
+//////////////////////////////////////////////////////////////////////////////////
+// [ show_hex ]  
+//////////////////////////////////////////////////////////////////////////////////
+int C_App::show_hex(Gtk::TextView* pTV, uint64_t Offset, uint64_t Size){
+    
+   ostringstream sData; 
+    
+   uint64_t vaddress = (uint64_t)pFile + Offset, i, j, BYTESPERLINE = 16;
+   char ch;
+
+   for(i = 0; i < Size; i += BYTESPERLINE){
+
+      ///////////////////////////////////////////////////////////
+      // Offset
+      sData << "0x" << hex << uppercase << setw(8) << setfill('0') << Offset + i << " || ";
+      
+      ///////////////////////////////////////////////////////////
+      // Hex
+      for(j = 0; j < BYTESPERLINE; j++){
+         if(i + j == Size){
+            for(uint64_t x = 0; x < (BYTESPERLINE - j - 1); x++) sData << "   ";
+            sData << "  ";
+            break;
+         }
+         sData << hex << uppercase << setw(2) << setfill('0') << (int)*(unsigned char*)(vaddress + i + j);
+         if(j != BYTESPERLINE - 1) sData << " ";
+      }
+
+      ///////////////////////////////////////////////////////////
+      // Asccii
+      sData << " || ";
+
+      for(j = 0; j < BYTESPERLINE; j++){
+         if(i + j == Size) break;
+         ch = *(unsigned char*)(vaddress + i + j);
+         if(isalnum(ch) || ch == ' ') sData << ch;
+         else                         sData << ".";
+      }
+      sData << endl;
+   }
+   
+   //////////////////////////////////////////////////
+
+   pTV->get_buffer()->set_text(sData.str());
+
+   return(C_APP_READY);  
 }

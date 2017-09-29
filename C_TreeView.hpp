@@ -21,11 +21,7 @@
  
  const int C_TREEVIEW_ERROR = 0x00;
  const int C_TREEVIEW_READY = 0x01;
-   
- const int C_TREEVIEW_ELF = 0xFF00;
- const int C_TREEVIEW_PRO = 0xFF01;
- const int C_TREEVIEW_SEC = 0xFF02;
- 
+
 //////////////////////////////////////////////////////////////////////////////////
 // CLASS
 //////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +30,7 @@
    
     public:
        
-       C_TreeView(int id);
+       C_TreeView();
        virtual ~C_TreeView();
 
        ////////////////////////
@@ -70,10 +66,6 @@
        /////////////////////////
        
        Gdk::RGBA colorB1, colorF1, colorB2, colorF2;
-       
-       /////////////////////////
-       
-       int id;
  };
  
 #endif // _C_TREEVIEW_H_

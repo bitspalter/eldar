@@ -2,9 +2,9 @@
 // [ APP_Class_Header ]
 //////////////////////////////////////////////////////////////////////////////////
 //
-// eldar ver:0.2
+// eldar ver:0.3
 //
-// [::Last modi: 19.09.17 L.ey (µ~)::]
+// [::Last modi: 29.09.17 L.ey (µ~)::]
 //
 //
 #ifndef _C_APP_H_
@@ -64,7 +64,67 @@
     ostringstream* pMeaning;
     int*           pHidden;
  };
-
+ 
+ //////////////////////////////
+ 
+ struct SText {
+    Gtk::ScrolledWindow window;
+    Gtk::TextView view;   
+    Glib::RefPtr<Gtk::TextBuffer> pbuffer; 
+ };
+ 
+ struct SSection {
+    SText Relocation;
+    SText SymTab;
+    SText Dynamic;
+    SText Note;
+    SText String;
+    SText Gnu_Verdef;
+    SText Gnu_Verneed;
+    SText Gnu_Versym;
+ };
+ 
+ struct SHex {
+    SText ElfHead;
+    SText ProHead;
+    SText ProFile;
+    SText SecHead;
+    SText SecFile;
+ };
+ 
+ //////////////////////////////
+ 
+ struct SPaned {
+    Gtk::Paned VElf{Gtk::ORIENTATION_VERTICAL};  
+    Gtk::Paned VPro{Gtk::ORIENTATION_VERTICAL};
+    Gtk::Paned HPro{Gtk::ORIENTATION_HORIZONTAL};
+    Gtk::Paned VSec{Gtk::ORIENTATION_VERTICAL};
+    Gtk::Paned HSec{Gtk::ORIENTATION_HORIZONTAL};
+ };
+ 
+ //////////////////////////////
+ 
+ struct STag {
+    Glib::RefPtr<Gtk::TextBuffer::TagTable> Table;   
+    Glib::RefPtr<Gtk::TextBuffer::Tag> BG_White;
+    Glib::RefPtr<Gtk::TextBuffer::Tag> BG_Black;
+    Glib::RefPtr<Gtk::TextBuffer::Tag> FG_Black;
+    Glib::RefPtr<Gtk::TextBuffer::Tag> FG_Green;
+ };
+ 
+ //////////////////////////////
+ 
+ struct STreeView {
+    Gtk::ScrolledWindow window;    
+    C_TreeView view; 
+ };
+ 
+ struct STView {
+    STreeView Elf;
+    STreeView Pro;
+    STreeView Sec;
+ };
+ 
 //////////////////////////////////////////////////////////////////////////////////
 // CLASS
 //////////////////////////////////////////////////////////////////////////////////
@@ -78,34 +138,37 @@
 
     protected:
         
-       Gtk::Box            m_VB_Main, m_VB_Sec;
-       Gtk::Layout         m_layout;
-       Gtk::HeaderBar      m_header_bar;
-       Gtk::Notebook       m_NB_Main, m_NB_Sec;
-       Gtk::ScrolledWindow m_SW_Elf, m_SW_Pro, m_SW_Sec;
+       Gtk::HeaderBar m_header_bar; 
+       Gtk::Box       m_VB_Main, m_VB_Sec;
+       Gtk::Notebook  m_NB_Main, m_NB_Sec;
        
-       Gtk::ScrolledWindow m_SW_Relocation, m_SW_SymTab, m_SW_Dynamic, m_SW_Note, m_SW_String, m_SW_Gnu_Verdef, m_SW_Gnu_Verneed, m_SW_Gnu_Versym;
-       Gtk::TextView       m_TV_Relocation, m_TV_SymTab, m_TV_Dynamic, m_TV_Note, m_TV_String, m_TV_Gnu_Verdef, m_TV_Gnu_Verneed, m_TV_Gnu_Versym;
-
-       Glib::RefPtr<Gtk::TextBuffer> pTB_Relocation, pTB_SymTab, pTB_Dynamic, pTB_Note, pTB_String, pTB_Gnu_Verdef, pTB_Gnu_Verneed, pTB_Gnu_Versym;
-
-       SButton sbutton;
-       SLabel  slabel;
-       
-       C_TreeView CTV_ELF{C_TREEVIEW_ELF}, CTV_Program{C_TREEVIEW_PRO}, CTV_Section{C_TREEVIEW_SEC};
-       
+       //////////////////////////////////
+ 
+       STView   stview;
+       STag     stag;
+       SPaned   spaned;
+       SSection ssection;
+       SHex     shex;
+       SButton  sbutton;
+       SLabel   slabel;
+ 
        //////////////////////////////////
        //Signal handlers:
        void on_button_open();
-       void on_notebook_switch_page(Gtk::Widget* page, guint page_num);
        bool on_configure_changed(GdkEventConfigure* configure_event);
+
+       void on_tv_elf_changed();
+       void on_tv_pro_changed();
+       void on_tv_sec_changed();
        
        //////////////////////////////////
        int open_file();
        
-       char* pfile;
-       
-       string sFile;
+       int      hFile;
+       char*    pFile;
+       uint64_t cFile;
+       bool     bFile;
+       string   sFile;
        
        //////////////////////////////////
        // 64Bit
@@ -114,7 +177,7 @@
        Elf64_Shdr* pSHead64;
        Elf64_Shdr* pSHStr64;
 
-       int read64bit(char* pfile);
+       int read64bit();
 
        int show_ELF64_Head();
        int show_ELF64_PHead();
@@ -144,7 +207,7 @@
        Elf32_Shdr* pSHead32;
        Elf32_Shdr* pSHStr32;
        
-       int read32bit(char* pfile);
+       int read32bit();
        
        int show_ELF32_Head();
        int show_ELF32_PHead();
@@ -170,6 +233,10 @@
        /////////////////////////////////
        
        Gtk::TreeModel::Row appand(Gtk::TreeModel::Row* pParent, SAppend* pSAppend);
+       
+       /////////////////////////////////
+       
+       int show_hex(Gtk::TextView* pTV, uint64_t Offset, uint64_t Size);
  };
 
 #endif // _C_APP_H_
