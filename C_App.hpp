@@ -25,7 +25,7 @@
  #include <unistd.h>
  #include <string.h>
 
- #define ALIGN_UP(addr, align)(((addr) + (align) - 1) & (~((align) - 1)))
+
  
  #include <gtkmm.h>
  
@@ -39,6 +39,10 @@
  const int C_APP_READY = 0x01;
 
  const int32_t magic = 0x464C457F;
+ 
+ /* Note segment for SystemTap probes.  */
+ #define NT_STAPSDT	3
+ #define ALIGN_UP(addr, align)(((addr) + (align) - 1) & (~((align) - 1)))
  
 //////////////////////////////////////////////////////////////////////////////////
 // STRUCT
@@ -170,6 +174,8 @@
        bool     bFile;
        string   sFile;
        
+       struct stat st;
+          
        //////////////////////////////////
        // 64Bit
        Elf64_Ehdr* pElf64;

@@ -141,8 +141,7 @@ C_App::C_App(){
    
    spaned.VElf.add1(stview.Elf.window);
    spaned.VElf.add2(shex.ElfHead.window);
-   spaned.VElf.set_position(300);
-   
+
    /////////////////////////////////
    shex.ProHead.pbuffer = Gtk::TextBuffer::create(stag.Table);
    shex.ProHead.window.add(shex.ProHead.view);
@@ -164,12 +163,10 @@ C_App::C_App(){
    
    spaned.HPro.add1(shex.ProHead.window);
    spaned.HPro.add2(shex.ProFile.window);
-   spaned.HPro.set_position(460);
-   
+
    spaned.VPro.add1(stview.Pro.window);
    spaned.VPro.add2(spaned.HPro);
-   spaned.VPro.set_position(300);
-   
+
    /////////////////////////////////
    shex.SecHead.pbuffer = Gtk::TextBuffer::create(stag.Table);
    shex.SecHead.window.add(shex.SecHead.view);
@@ -191,11 +188,9 @@ C_App::C_App(){
    
    spaned.HSec.add1(shex.SecHead.window);
    spaned.HSec.add2(shex.SecFile.window);
-   spaned.HSec.set_position(460);
-   
+
    spaned.VSec.add1(stview.Sec.window);
    spaned.VSec.add2(spaned.HSec);
-   spaned.VSec.set_position(300);
 
    //////////////////////////////////////////////////////////////
    // Notebook
@@ -294,9 +289,7 @@ void C_App::on_button_open(){
 // [ open_file ]
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::open_file(){
-   
-   struct stat st;
-   
+
    ///////////////////////////////////////////////////////
    // clear everything   
    
@@ -404,19 +397,19 @@ int C_App::open_file(){
 //////////////////////////////////////////////////////////////////////////////////
 int C_App::read64bit(){
 
-   //cout << "show_ELF64_Head" << endl;
+   cout << "show_ELF64_Head" << endl;
    
    pElf64 = (Elf64_Ehdr*)pFile;
    
    show_ELF64_Head();
    
-   //cout << "show_ELF64_PHead" << endl;
+   cout << "show_ELF64_PHead" << endl;
       
    pPHead64 = (Elf64_Phdr*)(pFile + pElf64->e_phoff);
    
    show_ELF64_PHead();
    
-   //cout << "show_ELF64_SHead" << endl;
+   cout << "show_ELF64_SHead" << endl;
       
    pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
    
@@ -425,45 +418,11 @@ int C_App::read64bit(){
 
    show_ELF64_SHead();
    
-   //cout << "show_Section64" << endl;
+   cout << "show_Section64" << endl;
       
    pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
    
    show_Section64();
-   
-   return(C_APP_READY);  
-}
-//////////////////////////////////////////////////////////////////////////////////
-// [ read32bit ]
-//////////////////////////////////////////////////////////////////////////////////
-int C_App::read32bit(){
-    
-   //cout << "show_ELF32_Head" << endl;
-   
-   pElf32 = (Elf32_Ehdr*)pFile;
-   
-   show_ELF32_Head();
-   
-   //cout << "show_ELF32_PHead" << endl;
-      
-   pPHead32 = (Elf32_Phdr*)(pFile + pElf32->e_phoff);
-   
-   show_ELF32_PHead();
-   
-   //cout << "show_ELF32_SHead" << endl;
-      
-   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
-   
-   if(pElf32->e_shstrndx != SHN_UNDEF)
-      pSHStr32 = &pSHead32[pElf32->e_shstrndx];
-
-   show_ELF32_SHead();
-   
-   //cout << "show_Section32" << endl;
-      
-   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
-   
-   show_Section32();
    
    return(C_APP_READY);  
 }
@@ -1267,49 +1226,49 @@ int C_App::show_Section64(){
    
    ///////////////////////////////////////////////////////////
    
-   //cout << "show_Dynamic64" << endl;
+   cout << "show_Dynamic64" << endl;
       
    for(auto pSHead: vDynamic) show_Dynamic64(pSHead);
     
    //////////////////////////////////
    
-   //cout << "show_Relocation64" << endl;
+   cout << "show_Relocation64" << endl;
    
    for(auto pSHead: vRelocation) show_Relocation64(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_SymTab64" << endl;
+   cout << "show_SymTab64" << endl;
    
    for(auto pSHead: vSymTab) show_SymTab64(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_Note64" << endl;
+   cout << "show_Note64" << endl;
    
    for(auto pSHead: vNote) show_Note64(pSHead); 
    
    //////////////////////////////////
    
-   //cout << "show_String64" << endl;
+   cout << "show_String64" << endl;
    
    for(auto pSHead: vStrings) show_String64(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_GNU_Verdef64" << endl;
+   cout << "show_GNU_Verdef64" << endl;
    
    for(auto pSHead: vGDef) show_GNU_Verdef64(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_GNU_Verneed64" << endl;
+   cout << "show_GNU_Verneed64" << endl;
    
    for(auto pSHead: vGNeed) show_GNU_Verneed64(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_GNU_Versym64" << endl;
+   cout << "show_GNU_Versym64" << endl;
    
    for(auto pSHead: vGSym) show_GNU_Versym64(pSHead);
 
@@ -1839,55 +1798,82 @@ int C_App::show_Note64(Elf64_Shdr* pSHead){
        
       Elf64_Nhdr* pNote = (Elf64_Nhdr*)(pFile + pSHead->sh_offset + Offset);
 
-      sData << "Name:" << (char*)(pNote) + sizeof(Elf64_Nhdr);
-
-      sData << " Type:";
-
-      switch(pNote->n_type){
-         case NT_GNU_ABI_TAG:
-            sData << "(NT_GNU_ABI_TAG)";      
-            
-            if(pNote->n_descsz == 0x10){
-            
-               int32_t* pDesc = (int32_t*)((char*)(pNote) + sizeof(Elf64_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
-               
-               sData << " OS:";
-               switch(pDesc[0]){
-                  case ELF_NOTE_OS_LINUX:    sData << "Linux";   break;
-                  case ELF_NOTE_OS_GNU:      sData << "GNU";     break;
-                  case ELF_NOTE_OS_SOLARIS2: sData << "Solaris"; break;
-                  case ELF_NOTE_OS_FREEBSD:  sData << "FreeBSD"; break;   
-               }
-               
-               sData << " ABI:" << dec << pDesc[1] << "." << pDesc[2] << "." << pDesc[3] << endl;
-            }
-            
-            break;
-         case NT_GNU_HWCAP:        
-            sData << "(NT_GNU_HWCAP)";        
-            break; 
-         case NT_GNU_BUILD_ID:     
-            sData << "(NT_GNU_BUILD_ID)";
-            
-            if(pNote->n_descsz){
-               unsigned char* pID = (unsigned char*)((unsigned char*)(pNote) + sizeof(Elf64_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
-               sData << " Build ID:";
-               for(uint32_t n = 0; n < pNote->n_descsz; n++)
-                  sData << hex << uppercase << setw(2) << setfill('0') << (int)*pID++;
-               sData << endl;
-            }
-
-            break;
-         case NT_GNU_GOLD_VERSION: 
-            sData << "(NT_GNU_GOLD_VERSION)";
-
-            if(pNote->n_descsz)
-               sData <<  " Version:" << (char*)((char*)(pNote) + sizeof(Elf64_Nhdr) + ALIGN_UP(pNote->n_namesz, 4)) << endl;
-            
-            break;
-         default: sData << "unknown";
-      }
+      string strName = (char*)(pNote) + sizeof(Elf64_Nhdr);
       
+      sData << "Name:" << strName << " Type:";
+
+      if(!strName.compare("GNU")){
+         switch(pNote->n_type){
+            case NT_GNU_ABI_TAG:
+               sData << "(NT_GNU_ABI_TAG)";
+               if(pNote->n_descsz == 0x10){
+                  int32_t* pDesc = (int32_t*)((char*)(pNote) + sizeof(Elf64_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
+                  sData << " OS:";
+                  switch(pDesc[0]){
+                     case ELF_NOTE_OS_LINUX:    sData << "Linux";   break;
+                     case ELF_NOTE_OS_GNU:      sData << "GNU";     break;
+                     case ELF_NOTE_OS_SOLARIS2: sData << "Solaris"; break;
+                     case ELF_NOTE_OS_FREEBSD:  sData << "FreeBSD"; break;   
+                  }
+                  sData << " ABI:" << dec << pDesc[1] << "." << pDesc[2] << "." << pDesc[3] << endl;
+               }
+               break;
+            case NT_GNU_HWCAP:        
+               sData << "(NT_GNU_HWCAP)";        
+               break; 
+            case NT_GNU_BUILD_ID:     
+               sData << "(NT_GNU_BUILD_ID)";
+               if(pNote->n_descsz){
+                  unsigned char* pID = (unsigned char*)((unsigned char*)(pNote) + sizeof(Elf64_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
+                  sData << " Build ID:";
+                  for(uint32_t n = 0; n < pNote->n_descsz; n++)
+                     sData << hex << uppercase << setw(2) << setfill('0') << (int)*pID++;
+                  sData << endl;
+               }
+               break;
+            case NT_GNU_GOLD_VERSION: 
+               sData << "(NT_GNU_GOLD_VERSION)";
+               if(pNote->n_descsz)
+                  sData <<  " Version:" << (char*)((char*)(pNote) + sizeof(Elf64_Nhdr) + ALIGN_UP(pNote->n_namesz, 4)) << endl;
+               break;
+            default: sData << "unknown" << endl;
+         } 
+      }else
+      if(!strName.compare("stapsdt")){
+         uint64_t* pData = nullptr;
+         uint64_t Location, Base, Semaphore;
+         char* pProvider = nullptr;
+         char* pName     = nullptr; 
+         char* pArgument = nullptr;
+         
+         switch(pNote->n_type){
+            case NT_STAPSDT:
+               sData << "(NT_STAPSDT)";
+
+               pData = (uint64_t*)((char*)(pNote) + sizeof(Elf64_Nhdr) + 8);
+               
+               Location  = *pData++;
+               Base      = *pData++;
+               Semaphore = *pData++;
+               
+               pProvider = (char*)(pData);
+               pName     = pProvider + strlen(pProvider) + 1;
+               pArgument = pName + strlen(pName) + 1;
+               
+               sData << " Provider:" << pProvider << " Name:" << pName << endl; 
+               
+               sData << " Location:0x"  << setw(16) << setfill('0') << Location;
+               sData << " Base:0x"      << setw(16) << setfill('0') << Base;
+               sData << " Semaphore:0x" << setw(16) << setfill('0') << Semaphore << " Argument:" << pArgument << endl;;
+               
+               break;     
+             
+            default: sData << "unknown" << endl; 
+         }
+      }else{
+         sData << "(currently unsupported)" << endl;    
+      }
+
       Size   -= (ALIGN_UP(pNote->n_namesz, 4) + ALIGN_UP(pNote->n_descsz, 4) + sizeof(Elf64_Nhdr));
       Offset += (ALIGN_UP(pNote->n_namesz, 4) + ALIGN_UP(pNote->n_descsz, 4) + sizeof(Elf64_Nhdr));
    }
@@ -2086,14 +2072,38 @@ int C_App::show_GNU_Versym64(Elf64_Shdr* pSHead){
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
-// [ on_configure_changed ]
+// [ read32bit ]
 //////////////////////////////////////////////////////////////////////////////////
-bool C_App::on_configure_changed(GdkEventConfigure* configure_event){
-   //m_SWindowPro.set_size_request(configure_event->width, configure_event->height);
+int C_App::read32bit(){
+    
+   cout << "show_ELF32_Head" << endl;
    
-   //m_Notebook.set_size_request(configure_event->width - 100, configure_event->height - 200);
+   pElf32 = (Elf32_Ehdr*)pFile;
    
-   return(false);
+   show_ELF32_Head();
+   
+   cout << "show_ELF32_PHead" << endl;
+      
+   pPHead32 = (Elf32_Phdr*)(pFile + pElf32->e_phoff);
+   
+   show_ELF32_PHead();
+   
+   cout << "show_ELF32_SHead" << endl;
+      
+   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
+   
+   if(pElf32->e_shstrndx != SHN_UNDEF)
+      pSHStr32 = &pSHead32[pElf32->e_shstrndx];
+
+   show_ELF32_SHead();
+   
+   cout << "show_Section32" << endl;
+      
+   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
+   
+   show_Section32();
+   
+   return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
 // [ show_ELF32_Head ]
@@ -2859,49 +2869,49 @@ int C_App::show_Section32(){
     
    ///////////////////////////////////////////////////////////
    
-   //cout << "show_Dynamic32" << endl;
+   cout << "show_Dynamic32" << endl;
       
    for(auto pSHead: vDynamic) show_Dynamic32(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_Relocation32" << endl;
+   cout << "show_Relocation32" << endl;
    
    for(auto pSHead: vRelocation) show_Relocation32(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_SymTab32" << endl;
+   cout << "show_SymTab32" << endl;
    
    for(auto pSHead: vSymTab) show_SymTab32(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_Note32" << endl;
+   cout << "show_Note32" << endl;
    
    for(auto pSHead: vNote) show_Note32(pSHead); 
    
    //////////////////////////////////
    
-   //cout << "show_String32" << endl;
+   cout << "show_String32" << endl;
    
    for(auto pSHead: vStrings) show_String32(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_GNU_Verdef32" << endl;
+   cout << "show_GNU_Verdef32" << endl;
    
    for(auto pSHead: vGDef) show_GNU_Verdef32(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_GNU_Verneed32" << endl;
+   cout << "show_GNU_Verneed32" << endl;
    
    for(auto pSHead: vGNeed) show_GNU_Verneed32(pSHead);
    
    //////////////////////////////////
    
-   //cout << "show_GNU_Versym32" << endl;
+   cout << "show_GNU_Versym32" << endl;
    
    for(auto pSHead: vGSym) show_GNU_Versym32(pSHead);
    
@@ -3432,57 +3442,83 @@ int C_App::show_Note32(Elf32_Shdr* pSHead){
        
       Elf32_Nhdr* pNote = (Elf32_Nhdr*)(pFile + pSHead->sh_offset + Offset);
 
-      sData << "Name:" << (char*)(pNote) + sizeof(Elf32_Nhdr);
-
-      sData << " Type:";
-
-      switch(pNote->n_type){
-         case NT_GNU_ABI_TAG:
-            sData << "(NT_GNU_ABI_TAG)";      
-            
-            if(pNote->n_descsz == 0x10){
-            
-               int32_t* pDesc = (int32_t*)((char*)(pNote) + sizeof(Elf32_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
-               
-               sData << " OS:";
-               switch(pDesc[0]){
-                  case ELF_NOTE_OS_LINUX:    sData << "Linux";   break;
-                  case ELF_NOTE_OS_GNU:      sData << "GNU";     break;
-                  case ELF_NOTE_OS_SOLARIS2: sData << "Solaris"; break;
-                  case ELF_NOTE_OS_FREEBSD:  sData << "FreeBSD"; break;   
-               }
-               
-               sData << " ABI:" << dec << pDesc[1] << "." << pDesc[2] << "." << pDesc[3] << endl;
-            }
-            
-            break;
-         case NT_GNU_HWCAP:        
-            sData << "(NT_GNU_HWCAP)";        
-            break; 
-         case NT_GNU_BUILD_ID:     
-            sData << "(NT_GNU_BUILD_ID)";
-            
-            if(pNote->n_descsz){
-               unsigned char* pID = (unsigned char*)((unsigned char*)(pNote) + sizeof(Elf32_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
-               sData << " Build ID:";
-               for(uint32_t n = 0; n < pNote->n_descsz; n++)
-                  sData << hex << uppercase << setw(2) << setfill('0') << (int)*pID++;
-               sData << endl;
-            }
-
-            break;
-         case NT_GNU_GOLD_VERSION: 
-            sData << "(NT_GNU_GOLD_VERSION)";
-
-            if(pNote->n_descsz)
-               sData <<  " Version:" << (char*)((char*)(pNote) + sizeof(Elf32_Nhdr) + ALIGN_UP(pNote->n_namesz, 4)) << endl;
-            
-            break;
-         default: sData << "unknown";
-      }
+      string strName = (char*)(pNote) + sizeof(Elf32_Nhdr);
       
-      Size   -= (ALIGN_UP(pNote->n_namesz, 4) + ALIGN_UP(pNote->n_descsz, 4) + sizeof(Elf64_Nhdr));
-      Offset += (ALIGN_UP(pNote->n_namesz, 4) + ALIGN_UP(pNote->n_descsz, 4) + sizeof(Elf64_Nhdr));
+      sData << "Name:" << strName << " Type:";
+
+      if(!strName.compare("GNU")){
+         switch(pNote->n_type){
+            case NT_GNU_ABI_TAG:
+               sData << "(NT_GNU_ABI_TAG)";
+               if(pNote->n_descsz == 0x10){
+                  int32_t* pDesc = (int32_t*)((char*)(pNote) + sizeof(Elf32_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
+                  sData << " OS:";
+                  switch(pDesc[0]){
+                     case ELF_NOTE_OS_LINUX:    sData << "Linux";   break;
+                     case ELF_NOTE_OS_GNU:      sData << "GNU";     break;
+                     case ELF_NOTE_OS_SOLARIS2: sData << "Solaris"; break;
+                     case ELF_NOTE_OS_FREEBSD:  sData << "FreeBSD"; break;   
+                  }
+                  sData << " ABI:" << dec << pDesc[1] << "." << pDesc[2] << "." << pDesc[3] << endl;
+               }
+               break;
+            case NT_GNU_HWCAP:        
+               sData << "(NT_GNU_HWCAP)";        
+               break; 
+            case NT_GNU_BUILD_ID:     
+               sData << "(NT_GNU_BUILD_ID)";
+               if(pNote->n_descsz){
+                  unsigned char* pID = (unsigned char*)((unsigned char*)(pNote) + sizeof(Elf32_Nhdr) + ALIGN_UP(pNote->n_namesz, 4));
+                  sData << " Build ID:";
+                  for(uint32_t n = 0; n < pNote->n_descsz; n++)
+                     sData << hex << uppercase << setw(2) << setfill('0') << (int)*pID++;
+                  sData << endl;
+               }
+               break;
+            case NT_GNU_GOLD_VERSION: 
+               sData << "(NT_GNU_GOLD_VERSION)";
+               if(pNote->n_descsz)
+                  sData <<  " Version:" << (char*)((char*)(pNote) + sizeof(Elf32_Nhdr) + ALIGN_UP(pNote->n_namesz, 4)) << endl;
+               break;
+            default: sData << "unknown" << endl;
+         } 
+      }else
+      if(!strName.compare("stapsdt")){
+         uint32_t* pData = nullptr;
+         uint32_t Location, Base, Semaphore;
+         char* pProvider = nullptr;
+         char* pName     = nullptr; 
+         char* pArgument = nullptr;
+         
+         switch(pNote->n_type){
+            case NT_STAPSDT:
+               sData << "(NT_STAPSDT)";
+
+               pData = (uint32_t*)((char*)(pNote) + sizeof(Elf32_Nhdr) + 8);
+               
+               Location  = *pData++;
+               Base      = *pData++;
+               Semaphore = *pData++;
+               
+               pProvider = (char*)(pData);
+               pName     = pProvider + strlen(pProvider) + 1;
+               pArgument = pName + strlen(pName) + 1;
+               
+               sData << " Provider:" << pProvider << " Name:" << pName << endl; 
+               
+               sData << " Location:0x"  << setw(8) << setfill('0') << Location;
+               sData << " Base:0x"      << setw(8) << setfill('0') << Base;
+               sData << " Semaphore:0x" << setw(8) << setfill('0') << Semaphore << " Argument:" << pArgument << endl;;
+               
+               break;     
+             
+            default: sData << "unknown" << endl; 
+         }
+      }else{
+         sData << "(currently unsupported)" << endl;    
+      }
+      Size   -= (ALIGN_UP(pNote->n_namesz, 4) + ALIGN_UP(pNote->n_descsz, 4) + sizeof(Elf32_Nhdr));
+      Offset += (ALIGN_UP(pNote->n_namesz, 4) + ALIGN_UP(pNote->n_descsz, 4) + sizeof(Elf32_Nhdr));
    }
 
    //////////////////////////////////////////////////
@@ -3895,4 +3931,17 @@ int C_App::show_hex(Gtk::TextView* pTV, uint64_t Offset, uint64_t Size){
    pTV->get_buffer()->set_text(sData.str());
 
    return(C_APP_READY);  
+}
+//////////////////////////////////////////////////////////////////////////////////
+// [ on_configure_changed ]
+//////////////////////////////////////////////////////////////////////////////////
+bool C_App::on_configure_changed(GdkEventConfigure* configure_event){
+   if(!this->is_maximized()){
+      spaned.VElf.set_position(configure_event->height / 2);
+      spaned.HPro.set_position(configure_event->width  / 2);
+      spaned.VPro.set_position(configure_event->height / 2);
+      spaned.HSec.set_position(configure_event->width  / 2);
+      spaned.VSec.set_position(configure_event->height / 2);
+   }
+   return(false);
 }
