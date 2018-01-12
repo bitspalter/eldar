@@ -204,7 +204,8 @@
        
        vector<string> vGNUSymbol64;
        
-       bool bShnum64; // true if pElf64->e_shnum == SHN_UNDEF
+       bool     bShnum64; // true if pElf64->e_shnum == SHN_UNDEF
+       uint32_t cShnum64;
        
        //////////////////////////////
        //32Bit     
@@ -234,7 +235,8 @@
        
        vector<string> vGNUSymbol32;
        
-       bool bShnum32; // true if pElf32->e_shnum == SHN_UNDEF
+       bool     bShnum32; // true if pElf32->e_shnum == SHN_UNDEF
+       uint32_t cShnum32;
        
        /////////////////////////////////
        

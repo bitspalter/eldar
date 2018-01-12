@@ -333,6 +333,7 @@ int C_App::open_file(){
    pSHStr64 = nullptr;
    
    bShnum64 = false;
+   cShnum64 = 0;
    
    vGNUSymbol64.clear();
    vGNUSymbol64.resize(10);
@@ -403,28 +404,42 @@ int C_App::read64bit(){
    
    show_ELF64_Head();
    
-   cout << "show_ELF64_PHead" << endl;
-      
-   pPHead64 = (Elf64_Phdr*)(pFile + pElf64->e_phoff);
+   ///////////////////////////////////////////////////////
    
-   show_ELF64_PHead();
+   cout << "show_ELF64_PHead" << endl;
+
+   if(pElf64->e_phoff && pElf64->e_phoff < cFile){
+       
+      pPHead64 = (Elf64_Phdr*)(pFile + pElf64->e_phoff);
+   
+      show_ELF64_PHead();
+      
+   }else cout << "ELF64_PHead invalid" << endl;
+      
+   ///////////////////////////////////////////////////////
    
    cout << "show_ELF64_SHead" << endl;
-      
-   pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
-   
-   if(pElf64->e_shstrndx != SHN_UNDEF)
-      pSHStr64 = &pSHead64[pElf64->e_shstrndx];
 
-   show_ELF64_SHead();
-   
-   cout << "show_Section64" << endl;
+   if(pElf64->e_shoff && pElf64->e_shoff < cFile){
+       
+      pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
       
-   pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
+      if(pElf64->e_shstrndx != SHN_UNDEF)
+         pSHStr64 = &pSHead64[pElf64->e_shstrndx];
+      
+      show_ELF64_SHead();
+      
+      ////////////////////////////////////////////////////
+      
+      cout << "show_Section64" << endl;
+      
+      pSHead64 = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
    
-   show_Section64();
+      show_Section64();
    
-   return(C_APP_READY);  
+   }else cout << "ELF64_SHead invalid" << endl; 
+      
+   return(C_APP_READY);
 }
 //////////////////////////////////////////////////////////////////////////////////
 // [ show_ELF64_Head ]
@@ -687,7 +702,7 @@ int C_App::show_ELF64_Head(){
    sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
-   sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_flags;
+   sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf64->e_ehsize;
    sMeaning << "Size of ELF Header";
    
    appand(nullptr, &sAppend);
@@ -923,7 +938,7 @@ int C_App::show_ELF64_SHead(){
    
    Gtk::TreeModel::Row row;
    
-   int shnum = 0, Hidden = 0;
+   int Hidden = 0;
    
    SAppend sAppend;
    
@@ -937,10 +952,10 @@ int C_App::show_ELF64_SHead(){
    
    /////////////////////////////////////////////////////////// 
    
-   if(bShnum64) shnum = pSHead64->sh_size;
-   else         shnum = pElf64->e_shnum;
+   if(bShnum64) cShnum64 = pSHead64->sh_size;
+   else         cShnum64 = pElf64->e_shnum;
    
-   for(int n = 0; n < shnum; n++){
+   for(uint32_t n = 0; n < cShnum64; n++){
        
       Hidden = n + 1;
       
@@ -949,10 +964,11 @@ int C_App::show_ELF64_SHead(){
       sSize    << "0x"          << hex << uppercase << setw(2)  << setfill('0') << 4;
       sValue   << "0x"          << hex << uppercase << setw(8)  << setfill('0') << pSHead64->sh_name;
       
-      if(pSHStr64 != nullptr)
+      if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+         pSHStr64->sh_offset < cFile && pSHead64->sh_name < pSHStr64->sh_size)
          sMeaning << "Name: " << (char*)(pFile + pSHStr64->sh_offset + pSHead64->sh_name); 
       else
-         sMeaning << "Name: Unknown";
+         sMeaning << "Name: Invalid";
       
       row = appand(nullptr, &sAppend);
 
@@ -1008,7 +1024,6 @@ int C_App::show_ELF64_SHead(){
    
       Offset += 4;
       
-
       ///////////////////////////////////////////////////////////////
       
       sOffset  << "0x" << hex << uppercase << setw(16) << setfill('0') << Offset;
@@ -1164,9 +1179,7 @@ Gtk::TreeModel::Row C_App::appand(Gtk::TreeModel::Row* pParent, SAppend* pSAppen
 int C_App::show_Section64(){
     
    Elf64_Shdr* pSHead = (Elf64_Shdr*)(pFile + pElf64->e_shoff);
-   
-   int shnum = 0;
-   
+
    vector<Elf64_Shdr*> vNote;
    vector<Elf64_Shdr*> vSymTab;
    vector<Elf64_Shdr*> vDynamic;
@@ -1176,11 +1189,8 @@ int C_App::show_Section64(){
    vector<Elf64_Shdr*> vGNeed;
    vector<Elf64_Shdr*> vGSym;
    vector<Elf64_Shdr*> vStrings;
-   
-   if(bShnum64) shnum = pSHead64->sh_size;
-   else         shnum = pElf64->e_shnum;
-   
-   for(int n = 0; n < shnum; n++){   
+
+   for(uint32_t n = 0; n < cShnum64; n++){   
       switch(pSHead->sh_type){
          //case SHT_NULL:           cout << "(inactive)"                   << endl; break;    
          //case SHT_PROGBITS:       cout << "(program info)"               << endl; break;
@@ -1290,25 +1300,37 @@ int C_App::show_Relocation64(Elf64_Shdr* pSHead){
    
    sData << ssection.Relocation.pbuffer->get_text().data();
 
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else 
       sData << "Name:Unknown" << endl;
  
    //////////////////////////////////////////////////
    
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+   
    if(pSHead->sh_type == SHT_RELA){
-      pRela = (Elf64_Rela*)(pFile + pSHead->sh_offset);
+      pRela = (Elf64_Rela*)(pFile + pSHead->sh_offset); 
       cRelo = pSHead->sh_size / sizeof(Elf64_Rela);
    }else{
       pRel  = (Elf64_Rel*)(pFile + pSHead->sh_offset);
       cRelo = pSHead->sh_size / sizeof(Elf64_Rel);
    }
    
+   //////////////////////////////////////////////////
+   
+   if(pSHead->sh_link > cShnum64 - 1) return(C_APP_ERROR);
+   
    Elf64_Shdr* pSymHead = &pSHead64[pSHead->sh_link];
+   
+   if(pSymHead->sh_link > cShnum64 - 1) return(C_APP_ERROR);
+   
    Elf64_Shdr* pStrHead = &pSHead64[pSymHead->sh_link];
    
-   Elf64_Sym* pSymTab = (Elf64_Sym*)(pFile + pSymHead->sh_offset);   
+   if(!pSymHead->sh_offset || pSymHead->sh_offset > cFile) return(C_APP_ERROR);
+   
+   Elf64_Sym* pSymTab = (Elf64_Sym*)(pFile + pSymHead->sh_offset);
    
    //////////////////////////////////////////////////
    
@@ -1375,8 +1397,11 @@ int C_App::show_Relocation64(Elf64_Shdr* pSHead){
          default:                       sData << setw(20) << setfill(' ') << left << "unknown";
       }
 
-      sData << " Symbol:" << (char*)(pFile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
-
+      if(pStrHead->sh_offset && pStrHead->sh_offset < cFile)
+         sData << " Symbol:" << (char*)(pFile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
+      else 
+         sData << " Symbol:Unknown" << endl;
+      
       if(pSHead->sh_type == SHT_RELA) pRela++;
       else                            pRel++;
    }
@@ -1398,16 +1423,25 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
       
    //////////////////////////////////////////////////
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
-
+   
+   //////////////////////////////////////////////////
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+      
    Elf64_Dyn* pDyn = (Elf64_Dyn*)(pFile + pSHead->sh_offset);
    
-   int cDyn = pSHead->sh_size / sizeof(Elf64_Dyn); 
+   int cDyn = pSHead->sh_size / sizeof(Elf64_Dyn);
    
+   if(pSHead->sh_link > cShnum64 - 1) return(C_APP_ERROR);
+      
    Elf64_Shdr* pStrHead = &pSHead64[pSHead->sh_link];
+   
+   //////////////////////////////////////////////////
    
    for(int n = 0; n < cDyn; n++){
       if(pDyn->d_tag == DT_NULL) break;
@@ -1417,7 +1451,11 @@ int C_App::show_Dynamic64(Elf64_Shdr* pSHead){
       switch(pDyn->d_tag){
          case DT_NEEDED: 
             sData << setw(20) << setfill(' ') << "(DT_NEEDED)"; 
-            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pFile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            sData << " Val:0x" << setw(16) << setfill('0') << pDyn->d_un.d_val;
+            if(pStrHead->sh_offset && pStrHead->sh_offset < cFile)
+               sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            else
+               sData << " Name:Invalid" << endl;
             break;   
          case DT_PLTRELSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PLTRELSZ)";
@@ -1705,16 +1743,23 @@ int C_App::show_SymTab64(Elf64_Shdr* pSHead){
    
    //////////////////////////////////////////////////
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
-       
+   
+   //////////////////////////////////////////////////
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+   
    Elf64_Sym* pSymTab = (Elf64_Sym*)(pFile + pSHead->sh_offset);
    
    int cSymTab64 = pSHead->sh_size / sizeof(Elf64_Sym);
    
    if(pSHead->sh_type == SHT_DYNSYM) cDynSum64 = cSymTab64;
+   
+   if(pSHead->sh_link > cShnum64 - 1) return(C_APP_ERROR);
    
    Elf64_Shdr* pStrHead = &pSHead64[pSHead->sh_link];
    
@@ -1765,8 +1810,11 @@ int C_App::show_SymTab64(Elf64_Shdr* pSHead){
       sData << " Value:0x" << setw(16) << setfill('0') << pSymTab->st_value;
       sData << " Size:0x"  << setw(16) << setfill('0') << pSymTab->st_size;
       
-      sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pSymTab->st_name) << endl;
-
+      if(pStrHead->sh_offset && pStrHead->sh_offset < cFile)
+         sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pSymTab->st_name) << endl;
+      else
+         sData << " Name:Invalid" << endl; 
+      
       pSymTab++;    
    }   
 
@@ -1787,12 +1835,15 @@ int C_App::show_Note64(Elf64_Shdr* pSHead){
    
    sData << ssection.Note.pbuffer->get_text().data();
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
       
    //////////////////////////////////////////////////
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
    
    while(Size){
        
@@ -1894,7 +1945,8 @@ int C_App::show_String64(Elf64_Shdr* pSHead){
    
    sData << ssection.String.pbuffer->get_text().data();
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
@@ -1929,7 +1981,8 @@ int C_App::show_GNU_Verdef64(Elf64_Shdr* pSHead){
    
    sData << ssection.Gnu_Verdef.pbuffer->get_text().data();
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
@@ -1939,7 +1992,11 @@ int C_App::show_GNU_Verdef64(Elf64_Shdr* pSHead){
    Elf64_Verdef*  pVerdef  = nullptr;
    Elf64_Verdaux* pVerdaux = nullptr; 
    
+   if(pSHead->sh_link > cShnum64 - 1) return(C_APP_ERROR);
+   
    Elf64_Shdr* pStrHead = &pSHead64[pSHead->sh_link];
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
    
    uint32_t Size = pSHead->sh_size, Offset = 0;
    
@@ -1989,7 +2046,8 @@ int C_App::show_GNU_Verneed64(Elf64_Shdr* pSHead){
 
    sData << ssection.Gnu_Verneed.pbuffer->get_text().data();
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
@@ -1999,7 +2057,11 @@ int C_App::show_GNU_Verneed64(Elf64_Shdr* pSHead){
    Elf64_Verneed* pVerneed = nullptr;
    Elf64_Vernaux* pVernaux = nullptr; 
    
+   if(pSHead->sh_link > cShnum64 - 1) return(C_APP_ERROR);
+      
    Elf64_Shdr* pStrHead = &pSHead64[pSHead->sh_link];
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
    
    uint32_t Size = pSHead->sh_size, Offset = 0;
 
@@ -2045,13 +2107,16 @@ int C_App::show_GNU_Versym64(Elf64_Shdr* pSHead){
 
    sData << ssection.Gnu_Versym.pbuffer->get_text().data();
    
-   if(pSHStr64 != nullptr)
+   if(pSHStr64 != nullptr && pSHStr64->sh_offset && 
+      pSHStr64->sh_offset < cFile && pSHead->sh_name < pSHStr64->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr64->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
        
    ////////////////////////////////////////////////// 
 
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+      
    Elf64_Half* pVerdef = (Elf64_Half*)(pFile + pSHead->sh_offset);
    
    int cSym = pSHead->sh_size / sizeof(Elf64_Half);
@@ -2082,27 +2147,41 @@ int C_App::read32bit(){
    
    show_ELF32_Head();
    
-   cout << "show_ELF32_PHead" << endl;
-      
-   pPHead32 = (Elf32_Phdr*)(pFile + pElf32->e_phoff);
+   ///////////////////////////////////////////////////////
    
-   show_ELF32_PHead();
+   cout << "show_ELF32_PHead" << endl;
+   
+   if(pElf32->e_phoff && pElf32->e_phoff < cFile){   
+       
+      pPHead32 = (Elf32_Phdr*)(pFile + pElf32->e_phoff);
+   
+      show_ELF32_PHead();
+      
+   }else cout << "ELF32_PHead invalid" << endl;
+   
+   ///////////////////////////////////////////////////////
    
    cout << "show_ELF32_SHead" << endl;
-      
-   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
    
-   if(pElf32->e_shstrndx != SHN_UNDEF)
-      pSHStr32 = &pSHead32[pElf32->e_shstrndx];
+   if(pElf32->e_shoff && pElf32->e_shoff < cFile){
+    
+      pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
+   
+      if(pElf32->e_shstrndx != SHN_UNDEF)
+         pSHStr32 = &pSHead32[pElf32->e_shstrndx];
 
-   show_ELF32_SHead();
-   
-   cout << "show_Section32" << endl;
+      show_ELF32_SHead();
       
-   pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
+      ////////////////////////////////////////////////////
+      
+      cout << "show_Section32" << endl;
+      
+      pSHead32 = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
    
-   show_Section32();
-   
+      show_Section32();
+      
+   }else cout << "ELF32_SHead invalid" << endl; 
+
    return(C_APP_READY);  
 }
 //////////////////////////////////////////////////////////////////////////////////
@@ -2366,7 +2445,7 @@ int C_App::show_ELF32_Head(){
    sNumber  << "0x" << hex << uppercase << setw(2) << setfill('0') << n++;
    sOffset  << "0x" << hex << uppercase << setw(2) << setfill('0') << Offset;
    sSize    << "0x" << hex << uppercase << setw(2) << setfill('0') << 2;
-   sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf32->e_flags;
+   sValue   << "0x" << hex << uppercase << setw(4) << setfill('0') << pElf32->e_ehsize;
    sMeaning << "Size of ELF Header";
    
    appand(nullptr, &sAppend);
@@ -2602,7 +2681,7 @@ int C_App::show_ELF32_SHead(){
    
    Gtk::TreeModel::Row row;
    
-   int shnum = 0, Hidden = 0;
+   int Hidden = 0;
    
    SAppend sAppend;
    
@@ -2616,10 +2695,10 @@ int C_App::show_ELF32_SHead(){
    
    ///////////////////////////////////////////////////////////
    
-   if(bShnum32) shnum = pSHead32->sh_size;
-   else         shnum = pElf32->e_shnum;
+   if(bShnum32) cShnum32 = pSHead32->sh_size;
+   else         cShnum32 = pElf32->e_shnum;
    
-   for(int n = 0; n < shnum; n++){
+   for(uint32_t n = 0; n < cShnum32; n++){
        
       Hidden = n + 1;
       
@@ -2628,10 +2707,11 @@ int C_App::show_ELF32_SHead(){
       sSize    << "0x"          << hex << uppercase << setw(2) << setfill('0') << 4;
       sValue   << "0x"          << hex << uppercase << setw(8) << setfill('0') << pSHead32->sh_name;
       
-      if(pSHStr32 != nullptr)
+      if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+         pSHStr32->sh_offset < cFile && pSHead32->sh_name < pSHStr32->sh_size)
          sMeaning << "Name: " << (char*)(pFile + pSHStr32->sh_offset + pSHead32->sh_name); 
       else
-         sMeaning << "Name: Unknown";
+         sMeaning << "Name: Invalid";
 
       row = appand(nullptr, &sAppend);
 
@@ -2808,7 +2888,7 @@ int C_App::show_Section32(){
     
    Elf32_Shdr* pSHead = (Elf32_Shdr*)(pFile + pElf32->e_shoff);
    
-   int shnum = 0;
+
    
    vector<Elf32_Shdr*> vNote;
    vector<Elf32_Shdr*> vSymTab;
@@ -2819,11 +2899,8 @@ int C_App::show_Section32(){
    vector<Elf32_Shdr*> vGNeed;
    vector<Elf32_Shdr*> vGSym;
    vector<Elf32_Shdr*> vStrings;
-   
-   if(bShnum32) shnum = pSHead32->sh_size;
-   else         shnum = pElf32->e_shnum;
-   
-   for(int n = 0; n < shnum; n++){   
+
+   for(uint32_t n = 0; n < cShnum32; n++){   
       switch(pSHead->sh_type){
          //case SHT_NULL:           cout << "(inactive)"                   << endl; break;    
          //case SHT_PROGBITS:       cout << "(program info)"               << endl; break;
@@ -2928,16 +3005,25 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
       
    //////////////////////////////////////////////////   
     
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
-
+   
+   ////////////////////////////////////////////////// 
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+      
    Elf32_Dyn* pDyn = (Elf32_Dyn*)(pFile + pSHead->sh_offset);
    
    int cDyn = pSHead->sh_size / sizeof(Elf64_Dyn); 
    
+   if(pSHead->sh_link > cShnum32 - 1) return(C_APP_ERROR);
+   
    Elf32_Shdr* pStrHead = &pSHead32[pSHead->sh_link];
+   
+   ////////////////////////////////////////////////// 
    
    for(int n = 0; n < cDyn; n++){
       if(pDyn->d_tag == DT_NULL) break;
@@ -2947,7 +3033,11 @@ int C_App::show_Dynamic32(Elf32_Shdr* pSHead){
       switch(pDyn->d_tag){
          case DT_NEEDED: 
             sData << setw(20) << setfill(' ') << "(DT_NEEDED)"; 
-            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val << " Name:" << (char*)(pFile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            sData << " Val:0x" << setw(8) << setfill('0') << pDyn->d_un.d_val;
+            if(pStrHead->sh_offset && pStrHead->sh_offset < cFile)
+               sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pDyn->d_un.d_val) << endl;
+            else
+               sData << " Name:Invalid" << endl;
             break;   
          case DT_PLTRELSZ: 
             sData << setw(20) << setfill(' ') << "(DT_PLTRELSZ)";
@@ -3240,13 +3330,16 @@ int C_App::show_Relocation32(Elf32_Shdr* pSHead){
    
    sData << ssection.Relocation.pbuffer->get_text().data();
    
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
    
    //////////////////////////////////////////////////  
-    
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+      
    if(pSHead->sh_type == SHT_RELA){
       pRela = (Elf32_Rela*)(pFile + pSHead->sh_offset);
       cRelo = pSHead->sh_size / sizeof(Elf32_Rela);
@@ -3255,8 +3348,17 @@ int C_App::show_Relocation32(Elf32_Shdr* pSHead){
       cRelo = pSHead->sh_size / sizeof(Elf32_Rel);
    }
    
+   //////////////////////////////////////////////////
+   
+   if(pSHead->sh_link > cShnum32 - 1) return(C_APP_ERROR);
+   
    Elf32_Shdr* pSymHead = &pSHead32[pSHead->sh_link];
+   
+   if(pSymHead->sh_link > cShnum32 - 1) return(C_APP_ERROR);
+   
    Elf32_Shdr* pStrHead = &pSHead32[pSymHead->sh_link];
+   
+   if(!pSymHead->sh_offset || pSymHead->sh_offset > cFile) return(C_APP_ERROR);
    
    Elf32_Sym* pSymTab = (Elf32_Sym*)(pFile + pSymHead->sh_offset);
    
@@ -3326,7 +3428,10 @@ int C_App::show_Relocation32(Elf32_Shdr* pSHead){
          default:                  sData << setw(20) << setfill(' ') << left << "unknown";
       }
 
-      sData << " Symbol:" << (char*)(pFile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
+      if(pStrHead->sh_offset && pStrHead->sh_offset < cFile)
+         sData << " Symbol:" << (char*)(pFile + pStrHead->sh_offset + pSymTab[Symbol].st_name) << endl;
+      else 
+         sData << " Symbol:Unknown" << endl;
 
       if(pSHead->sh_type == SHT_RELA) pRela++;
       else                            pRel++;
@@ -3349,16 +3454,23 @@ int C_App::show_SymTab32(Elf32_Shdr* pSHead){
    
    //////////////////////////////////////////////////  
     
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
-       
+   
+   //////////////////////////////////////////////////
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+   
    Elf32_Sym* pSymTab = (Elf32_Sym*)(pFile + pSHead->sh_offset);
    
    int cSymTab32 = pSHead->sh_size / sizeof(Elf32_Sym);
    
    if(pSHead->sh_type == SHT_DYNSYM) cDynSum32 = cSymTab32;
+   
+   if(pSHead->sh_link > cShnum32 - 1) return(C_APP_ERROR);
    
    Elf32_Shdr* pStrHead = &pSHead32[pSHead->sh_link];
    
@@ -3409,7 +3521,10 @@ int C_App::show_SymTab32(Elf32_Shdr* pSHead){
       sData << " Value:0x" << setw(8) << setfill('0') << pSymTab->st_value;
       sData << " Size:0x"  << setw(8) << setfill('0') << pSymTab->st_size;
       
-      sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pSymTab->st_name) << endl;
+      if(pStrHead->sh_offset && pStrHead->sh_offset < cFile)
+         sData << " Name:" << (char*)(pFile + pStrHead->sh_offset + pSymTab->st_name) << endl;
+      else
+         sData << " Name:Invalid" << endl; 
 
       pSymTab++;    
    }   
@@ -3431,7 +3546,8 @@ int C_App::show_Note32(Elf32_Shdr* pSHead){
    
    sData << ssection.Note.pbuffer->get_text().data();
    
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
@@ -3537,7 +3653,8 @@ int C_App::show_String32(Elf32_Shdr* pSHead){
    
    sData << ssection.String.pbuffer->get_text().data();
    
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl; 
@@ -3572,7 +3689,8 @@ int C_App::show_GNU_Verdef32(Elf32_Shdr* pSHead){
    
    sData << ssection.Gnu_Verdef.pbuffer->get_text().data();
    
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
@@ -3581,6 +3699,8 @@ int C_App::show_GNU_Verdef32(Elf32_Shdr* pSHead){
 
    Elf32_Verdef*  pVerdef  = nullptr;
    Elf32_Verdaux* pVerdaux = nullptr; 
+   
+   if(pSHead->sh_link > cShnum32 - 1) return(C_APP_ERROR);
    
    Elf32_Shdr* pStrHead = &pSHead32[pSHead->sh_link];
    
@@ -3632,7 +3752,8 @@ int C_App::show_GNU_Verneed32(Elf32_Shdr* pSHead){
 
    sData << ssection.Gnu_Verneed.pbuffer->get_text().data();
    
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
@@ -3642,6 +3763,8 @@ int C_App::show_GNU_Verneed32(Elf32_Shdr* pSHead){
    Elf32_Verneed* pVerneed = nullptr;
    Elf32_Vernaux* pVernaux = nullptr; 
    
+   if(pSHead->sh_link > cShnum32 - 1) return(C_APP_ERROR);
+      
    Elf32_Shdr* pStrHead = &pSHead32[pSHead->sh_link];
    
    uint32_t Size = pSHead->sh_size, Offset = 0;
@@ -3688,13 +3811,16 @@ int C_App::show_GNU_Versym32(Elf32_Shdr* pSHead){
 
    sData << ssection.Gnu_Versym.pbuffer->get_text().data();
    
-   if(pSHStr32 != nullptr)
+   if(pSHStr32 != nullptr && pSHStr32->sh_offset && 
+      pSHStr32->sh_offset < cFile && pSHead->sh_name < pSHStr32->sh_size)
       sData << "Name:" << (char*)(pFile + pSHStr32->sh_offset + pSHead->sh_name) << endl;
    else
       sData << "Name:Unknown" << endl;
        
    ////////////////////////////////////////////////// 
-    
+   
+   if(!pSHead->sh_offset || pSHead->sh_offset > cFile) return(C_APP_ERROR);
+   
    Elf32_Half* pVerdef = (Elf32_Half*)(pFile + pSHead->sh_offset);
    
    int cSym = pSHead->sh_size / sizeof(Elf32_Half);
